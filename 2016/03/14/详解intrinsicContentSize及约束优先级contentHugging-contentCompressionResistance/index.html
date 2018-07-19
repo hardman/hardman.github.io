@@ -1,0 +1,363 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="hardman的blog">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="https://hardman.github.io">
+    <!--SEO-->
+
+<meta name="description" content="iOS，web，游戏技术探索"/>
+
+
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+
+<title>详解intrinsicContentSize及约束优先级contentHugging&amp;contentCompressionResistance | hardman的blog</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="hardman的blog" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1274215625 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1274215625%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpeg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='hardman'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> iOS开发，对web和游戏开发也有些许兴趣~ </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://hardman.github.io">hardman的blog</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                                <div id="menu-line-0"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS/"><i class="fa "></i>iOS</a>
+                                <div id="menu-line-1"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS推流/"><i class="fa "></i>iOS推流</a>
+                                <div id="menu-line-2"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/cocos/"><i class="fa "></i>cocos</a>
+                                <div id="menu-line-3"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>归档</a>
+                                <div id="menu-line-4"></div>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="详解intrinsicContentSize及约束优先级contentHugging&amp;contentCompressionResistance">
+            
+	            详解intrinsicContentSize及约束优先级contentHugging&amp;contentCompressionResistance
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/iOS">
+            iOS
+        </a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/iOS" title='iOS'>
+                        iOS
+                    </a>
+                
+                    <a href="/tags/autolayout" title='autolayout'>
+                        autolayout
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2016/03/14</span>
+        </span>
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <p>在了解intrinsicContentSize之前，我们需要先了解2个概念：</p>
+<ul>
+<li>AutoLayout在做什么</li>
+<li>约束优先级是什么意思。</li>
+</ul>
+<p>如果不了解这两个概念，看intinsic content size没有任何意义。<br>注：由于上面这几个概念都是针对UIView或其子类(UILabel，UIImageView等等)来说的。所以下文中都用UIView指代。</p>
+<h2 id="AutoLayout在做什么"><a href="#AutoLayout在做什么" class="headerlink" title="AutoLayout在做什么"></a>AutoLayout在做什么</h2><p>一个UIView想要显示在屏幕中，仅须有2个需要确定的元素，一是位置，二是大小。只要2者确定，UIView就可以正确显示，至于显示的内容，则由UIView自己决定（drawRect）。</p>
+<div align="center"><br><img src="http://img.blog.csdn.net/20160314170635059" width="500" align="center"><br></div><br>没有AutoLayout的时候，我们需要通过 initWithFrame:(CGRect)这种方式来指定UIView的位置和大小。<br><br>而使用AutoLayout的过程，就是通过约束来确定UIView的位置和大小的过程。<br><br>约束优先级<br>–<br>为什么约束需要优先级？因为有的时候2个约束可能会有冲突。<br><br>比如：有一个UIView 距离父UIView的左右距离都是0，这是2个约束，此时再给此UIView加一个宽度约束，比如指定宽度为100，那么就会产生约束冲突了。<br><div align="center"><br><img src="http://img.blog.csdn.net/20160314171333593" width="500" align="center"><br></div><br>因为，这两种约束不可能同时存在，只能满足一个，那么满足谁呢？默认情况下给UIView加的这几个约束优先级都是1000，属于最高的优先级了，表示此约束必须满足。<br><br>所以这种冲突不能被iOS所允许。此时就需要修改优先级了。把其中任意一个约束的优先级改为小于1000的值即可。<br><br>&gt;iOS可以通过比较两个”相互冲突的约束”的优先级，从而忽略低优先级的某个约束，达到正确布局的目的。<br><br>用鼠标选中宽度约束，然后在屏幕右侧的菜单中，修改优先级，如下图：<br><div align="center"><br><img src="http://img.blog.csdn.net/20160314171442562" width="500" align="center"><br></div><br>这样就没有约束冲突了。因为如果一旦两个约束冲突，系统会自动忽略优先级低的约束。<br><div align="center"><br><img src="http://img.blog.csdn.net/20160314171524062" width="500" align="center"><br></div><br>上面举的这个例子有些极端，因为上面两个约束都是确定的值，而且是绝对冲突。所以如果遇到这种情况，可能选择删掉某个约束更为合适。<br><br>而约束优先级更多的时候用于解决模糊约束（相对于上面的确定值约束来说）的冲突的问题。<br>比如有这样一个问题：<br><br>- UIView1有四个约束：距离父UIView左和上确定，宽和高也确定。<br>- UIView2在UIView1的下面，约束也有4个：上面距离UIView1确定，左面同UIView1对齐，同UIView1等高且等宽。<br>此时这两个UIView应该像这样：<br><div align="center"><br><img src="http://img.blog.csdn.net/20160314171652109" width="500" align="center"><br></div>
+
+<p>这是一个很普通的应用场景，假设我希望有这样一个效果： 我希望UIView2的宽度不能超过50。当UIView1宽度小于50的时候，二者等宽；当UIView1宽度大于50的时候，UIView2不受UIView1宽度的影响。<br>于是我给UIView2加上一条约束：宽度&lt;=50。这时候冲突来了：<br>因为UIView1的宽度是定好的，而UIView2和UIView1等宽。那么UIView2的宽度就是确定的。</p>
+<p>很显然，分为两种情况（根据UIView1的宽度不同）：</p>
+<ul>
+<li>若UIView1的宽度大于50，UIView2的宽度也一定大于50，这跟新加的限制宽度&lt;=50的约束是冲突的。 <div align="center"><br><img src="http://img.blog.csdn.net/20160314171756501" width="500" align="center"><br></div></li>
+<li>否则不冲突。<div align="center"><br><img src="http://img.blog.csdn.net/20160314171829329" width="500" align="center"><br></div>
+
+</li>
+</ul>
+<p>更糟糕的是，实际情况中，UIView1的宽度可能不是一个确定的值。它有可能会被页面中的其他View所影响，可能还会在运行时产生变化，并不能保证它的实际宽度一定小于50。所以，一旦产生约束冲突，可能就会对应用产生不确定的影响：可能显示错乱，也可能程序崩溃。</p>
+<p>所以我们为了得到正确的结果，应该这样处理：</p>
+<ol>
+<li>当UIView1宽度小于等于50的时候，约束不冲突，修改优先级与否都是一样结果。</li>
+<li>当UIView1宽度大于50的时候，忽略等宽约束，也就是降低等宽约束优先级。</li>
+</ol>
+<p>所以我们把等宽约束的优先级修改为999。上面两条都满足，问题解决。</p>
+<div align="center"><br><img src="http://img.blog.csdn.net/20160314171952440" width="500" align="center"><br></div>
+
+<p>说到模糊约束，content Hugging／content Compression Resistance就是2个UIView自带的模糊约束。<br>而这两个约束存在的条件则是UIView必须指定了 Intrinsic Content Size。<br>在了解这两个模糊约束之前，必须了解Intrinsic Content Size是什么东西。</p>
+<h2 id="Intrinsic-Contenet-Size"><a href="#Intrinsic-Contenet-Size" class="headerlink" title="Intrinsic Contenet Size"></a>Intrinsic Contenet Size</h2><p>Intrinsic Content Size：固有大小。顾名思义，在AutoLayout中，它作为UIView的属性（不是语法上的属性），意思就是说我知道自己的大小，如果你没有为我指定大小，我就按照这个大小来。</p>
+<p>比如：大家都知道在使用AutoLayout的时候，UILabel是不用指定尺寸大小的，只需指定位置即可，就是因为，只要确定了文字内容，字体等信息，它自己就能计算出大小来。</p>
+<div align="center"><br><img src="http://img.blog.csdn.net/20160314172131346" width="500" align="center"><br></div><br>UILabel，UIImageView，UIButton等这些组件及某些包含它们的系统组件都有 Intrinsic Content Size 属性。<br>也就是说，遇到这些组件，你只需要为其指定位置即可。大小就使用Intrinsic Content Size就行了。<br><br>在代码中，上述系统控件都重写了UIView 中的 -(CGSize)intrinsicContentSize: 方法。<br>并且在需要改变这个值的时候调用：invalidateIntrinsicContentSize 方法，通知系统这个值改变了。<br><br>所以当我们在编写继承自UIView的自定义组件时，也想要有Intrinsic Content Size的时候，就可以通过这种方法来轻松实现。<br><br>Intrinsic冲突<br>–<br><br>一个UIView有了 Intrinsic Content Size 之后，才可以只指定位置，而不用指定大小。并且才可能会触发上述两个约束。<br><br>但是问题又来了，对于上述这种UIView来说，只指定位置而不指定大小，有的时候会有问题。<br><br>我们用UILabel来举例吧（所有支持Intrinsic Content Size 的组件都有此问题）。<br>2个UILabel，UILabel1（文字内容：UILabel1）和UILabel2（文字内容：UILabel2），其内容按照下面说明布局：<br><br>- 2个UILabel距离上边栏为50点。<br>- UILabel1与左边栏距离为10，UILabel2左面距离UILabel1为10点。<br><br>因为都具有Intrinsic属性，所以不需要指定size。位置应该也明确了。<br><div align="center"><br><img src="http://img.blog.csdn.net/20160314172208377" width="500" align="center"><br></div>
+
+<p>现在问题来了，再给UILabel2加一条约束，右侧距离右边栏为10点。</p>
+<p>很明显，如果按照约束来布局，则没办法满足2个UIlabel都使用 Intrinsic Content Size，至少某个UILabel的宽度大于Intrinsic Content Size。这种情况，我们称之为2个组件之间的“Intrinsic冲突”。</p>
+<div align="center"><br><img src="http://img.blog.csdn.net/20160314172318414" width="500" align="center"><br></div>
+
+<p>解决“Intrinsic冲突”的方案有2种：</p>
+<ol>
+<li>两个UIlabel都不使用Intrinsic Content Size。为两个UIlabel增加新的约束，来显式指定它们的大小。如：给2个UIlabel增加宽度和高度约束或等宽等高约束等等。<div align="center"><br><img src="http://img.blog.csdn.net/20160314172405019" width="500" align="center"><br></div></li>
+<li>可以让其中一个UIlabel使用Intrinsic Content Size，另一个label则自动占用剩余的空间。这时候就需要用到 Content Hugging 和 Content Compression Resistance了！具体做法在下面介绍。</li>
+</ol>
+<blockquote>
+<p>一句话总结“Intrinsic冲突”：两个或多个可以使用Intrinsic Content Size的组件，因为组件中添加的其他约束，而无法同时使用 intrinsic Content Size了。</p>
+</blockquote>
+<h2 id="content-Hugging／content-Compression-Resistance"><a href="#content-Hugging／content-Compression-Resistance" class="headerlink" title="content Hugging／content Compression Resistance"></a>content Hugging／content Compression Resistance</h2><p>首先，这两个概念都是UIView的属性。</p>
+<p>假设两个组件产生了“Intrinsic冲突”：</p>
+<ol>
+<li>Content Hugging 约束（不想变大约束）表示：如果组件的此属性优先级比另一个组件此属性优先级高的话，那么这个组件就保持不变，另一个可以在需要拉伸的时候拉伸。属性分横向和纵向2个方向。</li>
+<li>Content Compression Resistance 约束（不想变小约束）表示：如果组件的此属性优先级比另一个组件此属性优先级高的话，那么这个组件就保持不变，另一个可以在需要压缩的时候压缩。属性分横向和纵向2个方向。</li>
+</ol>
+<p>意思很明显。上面UIlabel这个例子中，很显然，如果某个UILabel使用Intrinsic Content Size的时候，另一个需要拉伸。<br>所以我们需要调整两个UILabel的 Content Hugging约束的优先级就可以啦。<br>在这个页面可以调整优先级（拉到最下面）。</p>
+<div align="center"><br><img src="http://img.blog.csdn.net/20160314172538285" width="500" align="center"><br></div>
+
+<p>分别调整两个UILabel的 Content Hugging的优先级可以得到不同的结果：</p>
+<div align="center"><br><img src="http://img.blog.csdn.net/20160314172613903" width="500" align="center"><br></div><br><div align="center"><br><img src="http://img.blog.csdn.net/20160314172651785" width="500" align="center"><br></div>
+
+<p>Content Compression Resistance 的情况就不多说了，原理相同。</p>
+<h2 id="在代码中修改UIView的这两个优先级"><a href="#在代码中修改UIView的这两个优先级" class="headerlink" title="在代码中修改UIView的这两个优先级"></a>在代码中修改UIView的这两个优先级</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[label setContentHuggingPriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisHorizontal];</span><br><span class="line">[label setContentCompressionResistancePriority: UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisHorizontal];</span><br></pre></td></tr></table></figure>
+<p>Priority是个enum：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">typedef float UILayoutPriority;</span><br><span class="line">static const UILayoutPriority UILayoutPriorityRequired NS_AVAILABLE_IOS(6_0) = 1000; // A required constraint.  Do not exceed this.</span><br><span class="line">static const UILayoutPriority UILayoutPriorityDefaultHigh NS_AVAILABLE_IOS(6_0) = 750; // This is the priority level with which a button resists compressing its content.</span><br><span class="line">static const UILayoutPriority UILayoutPriorityDefaultLow NS_AVAILABLE_IOS(6_0) = 250; // This is the priority level at which a button hugs its contents horizontally.</span><br><span class="line">static const UILayoutPriority UILayoutPriorityFittingSizeLevel NS_AVAILABLE_IOS(6_0) = 50; // When you send -[UIView systemLayoutSizeFittingSize:], the size fitting most closely to the target size (the argument) is computed.  UILayoutPriorityFittingSizeLevel is the priority level with which the view wants to conform to the target size in that computation.  It&apos;s quite low.  It is generally not appropriate to make a constraint at exactly this priority.  You want to be higher or lower.</span><br></pre></td></tr></table></figure></p>
+<p>Axis表示横向及纵向：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">typedef NS_ENUM(NSInteger, UILayoutConstraintAxis) &#123;</span><br><span class="line">    UILayoutConstraintAxisHorizontal = 0,</span><br><span class="line">    UILayoutConstraintAxisVertical = 1</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="创建自定义具有-Intrinsic-Content-Size-功能的组件"><a href="#创建自定义具有-Intrinsic-Content-Size-功能的组件" class="headerlink" title="创建自定义具有 Intrinsic Content Size 功能的组件"></a>创建自定义具有 Intrinsic Content Size 功能的组件</h2><p>代码及注释如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//IntrinsicView.h</span><br><span class="line">#import &lt;UIKit/UIKit.h&gt;</span><br><span class="line"></span><br><span class="line">@interface IntrinsicView : UIView</span><br><span class="line">@property (nonatomic) CGSize extendSize;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">//IntrinsicView.m</span><br><span class="line">#import &quot;IntrinsicView.h&quot;</span><br><span class="line"></span><br><span class="line">static bool closeIntrinsic = false;//测试关闭Intrinsic的影响</span><br><span class="line"></span><br><span class="line">@implementation IntrinsicView</span><br><span class="line"></span><br><span class="line">- (instancetype)init</span><br><span class="line">&#123;</span><br><span class="line">    self = [super init];</span><br><span class="line">    if (self) &#123;</span><br><span class="line">        //不兼容旧版Autoreizingmask，只使用AutoLayout</span><br><span class="line">        //如果为YES，在AutoLayout中则会自动将view的frame和bounds属性转换为约束。</span><br><span class="line">        self.translatesAutoresizingMaskIntoConstraints = NO;</span><br><span class="line">    &#125;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//当用户设置extendSize时，提示系统IntrinsicContentSize变化了。</span><br><span class="line">-(void)setExtendSize:(CGSize)extendSize&#123;</span><br><span class="line">    _extendSize = extendSize;</span><br><span class="line">    //如果不加这句话，在view显示之后（比如延时几秒），再设置extendSize不会有效果。</span><br><span class="line">    //本例中也就是testInvalidateIntrinsic的方法不会产生预期效果。</span><br><span class="line">    [self invalidateIntrinsicContentSize];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//通过覆盖intrinsicContentSize函数修改View的Intrinsic的大小</span><br><span class="line">-(CGSize)intrinsicContentSize&#123;</span><br><span class="line">    if (closeIntrinsic) &#123;</span><br><span class="line">        return CGSizeMake(UIViewNoIntrinsicMetric, UIViewNoIntrinsicMetric);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return CGSizeMake(_extendSize.width, _extendSize.height);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">//测试代码</span><br><span class="line">#import &quot;ViewController.h&quot;</span><br><span class="line">#import &quot;newViewCtlViewController.h&quot;</span><br><span class="line">#import &quot;IntrinsicView.h&quot;</span><br><span class="line"></span><br><span class="line">@interface ViewController ()</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation ViewController</span><br><span class="line"></span><br><span class="line">-(void)viewDidLoad&#123;</span><br><span class="line">    [super viewDidLoad];</span><br><span class="line">    [self testIntrinsicView];</span><br><span class="line">&#125;+</span><br><span class="line">-(void) testIntrinsicView&#123;</span><br><span class="line">    IntrinsicView *intrinsicView1 = [[IntrinsicView alloc] init];</span><br><span class="line">    intrinsicView1.extendSize = CGSizeMake(100, 100);</span><br><span class="line">    intrinsicView1.backgroundColor = [UIColor greenColor];</span><br><span class="line">    [self.view addSubview:intrinsicView1];</span><br><span class="line">    [self.view addConstraints:@[</span><br><span class="line">                                //距离superview上方100点</span><br><span class="line">                                  [NSLayoutConstraint constraintWithItem:intrinsicView1 attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTop multiplier:1 constant:100],</span><br><span class="line">                                  //距离superview左面10点</span><br><span class="line">                                  [NSLayoutConstraint constraintWithItem:intrinsicView1 attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeft multiplier:1 constant:10],</span><br><span class="line">    ]];</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    IntrinsicView *intrinsicView2 = [[IntrinsicView alloc] init];</span><br><span class="line">    intrinsicView2.extendSize = CGSizeMake(100, 30);</span><br><span class="line">    intrinsicView2.backgroundColor = [UIColor redColor];</span><br><span class="line">    [self.view addSubview:intrinsicView2];</span><br><span class="line">    [self.view addConstraints:@[</span><br><span class="line">                                //距离superview上方220点</span><br><span class="line">                                [NSLayoutConstraint constraintWithItem:intrinsicView2 attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTop multiplier:1 constant:220],</span><br><span class="line">                                //距离superview左面10点</span><br><span class="line">                                [NSLayoutConstraint constraintWithItem:intrinsicView2 attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeft multiplier:1 constant:10],</span><br><span class="line">                                ]];</span><br><span class="line">    </span><br><span class="line">    [self performSelector:@selector(testInvalidateIntrinsic:) withObject:intrinsicView2 afterDelay:2];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(void) testInvalidateIntrinsic:(IntrinsicView *)view&#123;</span><br><span class="line">    view.extendSize = CGSizeMake(100, 80);</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<p>代码效果如下：</p>
+<div align="center"><br><img src="http://img.blog.csdn.net/20160314173711526" width="500" align="center"><br></div>
+
+
+    </div>
+
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">hardman</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2016/04/22/Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android-iOS-cocos2dx（一）/" class="pre-post btn btn-default" title='Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（一）'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（一）</span>
+        </a>
+    
+    
+</div>
+
+
+    <div id="comments">
+        
+    
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'kL6uvsjGUgAWOmaJfW8iYNYz-gzGzoHsz',
+            appKey: 'X0NBsfhG3fTX42b6xpCLsvsP',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: false,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: 'zh-CN'.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#AutoLayout在做什么"><span class="toc-text">AutoLayout在做什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Intrinsic-Contenet-Size"><span class="toc-text">Intrinsic Contenet Size</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#content-Hugging／content-Compression-Resistance"><span class="toc-text">content Hugging／content Compression Resistance</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在代码中修改UIView的这两个优先级"><span class="toc-text">在代码中修改UIView的这两个优先级</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建自定义具有-Intrinsic-Content-Size-功能的组件"><span class="toc-text">创建自定义具有 Intrinsic Content Size 功能的组件</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"> 
+                <span>Copyright &copy; 2018
+                </span> | 
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> | 
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+
+</body>
+</html>

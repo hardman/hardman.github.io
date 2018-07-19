@@ -1,0 +1,363 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="hardman的blog">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="https://hardman.github.io">
+    <!--SEO-->
+
+<meta name="description" content="iOS，web，游戏技术探索"/>
+
+
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+
+<title>1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步  | hardman的blog</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="hardman的blog" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1274215625 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1274215625%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpeg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='hardman'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> iOS开发，对web和游戏开发也有些许兴趣~ </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://hardman.github.io">hardman的blog</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                                <div id="menu-line-0"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS/"><i class="fa "></i>iOS</a>
+                                <div id="menu-line-1"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS推流/"><i class="fa "></i>iOS推流</a>
+                                <div id="menu-line-2"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/cocos/"><i class="fa "></i>cocos</a>
+                                <div id="menu-line-3"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>归档</a>
+                                <div id="menu-line-4"></div>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步 ">
+            
+	            1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步 
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/iOS推流">
+            iOS推流
+        </a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/iOS" title='iOS'>
+                        iOS
+                    </a>
+                
+                    <a href="/tags/iOS推流" title='iOS推流'>
+                        iOS推流
+                    </a>
+                
+                    <a href="/tags/源码" title='源码'>
+                        源码
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2017/11/23</span>
+        </span>
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>最简单的iOS 推流代码，视频捕获，软编码(faac，x264)，硬编码（aac，h264），美颜，flv编码，rtmp协议，陆续更新代码解析，你想学的知识这里都有，愿意懂直播技术的同学快来看！！</p>
+</blockquote>
+<blockquote>
+<p>源代码：<a href="https://github.com/hardman/AWLive" target="_blank" rel="noopener">https://github.com/hardman/AWLive</a></p>
+</blockquote>
+<p>前文介绍了如何获取音视频的aac/h264数据，那么如何将数据写入rtmp流中呢？<br>rtmp最初是Adobe Flash用于音视频播放的一个实时传输协议。而flv正是Adobe推出的一个视频格式，因此rtmp协议支持flv视频流。<br>这里可以我们把获取的aac/h264的数据，直接转成flv格式的视频帧，然后按照时间戳依次发送给服务端即可。</p>
+<h2 id="flv格式简介"><a href="#flv格式简介" class="headerlink" title="flv格式简介"></a>flv格式简介</h2><p>flv总体来说是一个简单的视频格式，它包含2部分：header 和 body。</p>
+<p>header是固定格式的数据，表示本文件是一个flv文件。<br>header的长度是9个字节。</p>
+<p>header后面紧跟着body数据。body是由一个一个称为的tag数据组成。<br>tag其实就是一个固定格式的数据块，构造方式同header类似，只是叫法不同而已。</p>
+<p>tag分为3种。script tag，video tag，audio tag。<br>script tag是flv的第一个tag，用于放一些视频信息的，比如duration，width，height等。script tag对于flv格式的视频文件比较重要，对于rtmp来说，可以不写入script tag。<br>video tag是视频数据的封装，也就是我们获取的h264数据基础之上，增加一些flv特定的数据。<br>audio tag同video tag类似，是acc数据的封装。</p>
+<h2 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h2><p>flv相关代码在 aw_encode_flv.h和aw_encode_flv.c中。<br>此模块提供了flv编码(aac+h264)功能。</p>
+<p>这个模块的暴露给外部的api为2部分：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">//一部分是创建flv的方法</span><br><span class="line">//写入header</span><br><span class="line">extern void aw_write_flv_header(aw_data **flv_data);</span><br><span class="line">//写入flv tag</span><br><span class="line">extern void aw_write_flv_tag(aw_data **flv_data, aw_flv_common_tag *common_tag);</span><br><span class="line"></span><br><span class="line">//第二部分是所有tag的构造</span><br><span class="line">//script tag</span><br><span class="line">extern aw_flv_script_tag *alloc_aw_flv_script_tag();</span><br><span class="line">extern void free_aw_flv_script_tag(aw_flv_script_tag **);</span><br><span class="line"></span><br><span class="line">//audio tag</span><br><span class="line">extern aw_flv_audio_tag *alloc_aw_flv_audio_tag();</span><br><span class="line">extern void free_aw_flv_audio_tag(aw_flv_audio_tag **);</span><br><span class="line"></span><br><span class="line">//video tag</span><br><span class="line">extern aw_flv_video_tag *alloc_aw_flv_video_tag();</span><br><span class="line">extern void free_aw_flv_video_tag(aw_flv_video_tag **);</span><br></pre></td></tr></table></figure></p>
+<p>外部使用时，可根据具体数据先创建不同的tag，填充好各个数据，然后使用aw_write_flv_tag方法将tag写入aw_data中。<br>可用上述方法可以构造出完整的flv文件。</p>
+<h2 id="aw-data"><a href="#aw-data" class="headerlink" title="aw_data"></a>aw_data</h2><p>aw_data是为了方便文件数据的读取/写入和管理而创建的工具模块。<br>此模块已处理了大端小端差异，能够让文件读写更加方便快捷。<br>相关代码在aw_data.h / aw_data.c中。</p>
+<h2 id="flv-header"><a href="#flv-header" class="headerlink" title="flv header"></a>flv header</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">extern void aw_write_flv_header(aw_data **flv_data)&#123;</span><br><span class="line">    uint8_t</span><br><span class="line">    f = &apos;F&apos;, l = &apos;L&apos;, v = &apos;V&apos;,//FLV</span><br><span class="line">    version = 1,//固定值</span><br><span class="line">    av_flag = 5;//5表示av，5表示只有a，1表示只有v</span><br><span class="line">    uint32_t flv_header_len = 9;//header固定长度为9</span><br><span class="line">    data_writer.write_uint8(flv_data, f);</span><br><span class="line">    data_writer.write_uint8(flv_data, l);</span><br><span class="line">    data_writer.write_uint8(flv_data, v);</span><br><span class="line">    data_writer.write_uint8(flv_data, version);</span><br><span class="line">    data_writer.write_uint8(flv_data, av_flag);</span><br><span class="line">    data_writer.write_uint32(flv_data, flv_header_len);</span><br><span class="line">    </span><br><span class="line">    //first previous tag size 根据flv协议，每个tag后要写入当前tag的size，称为previous tag size，header后面需要写入4字节空数据。</span><br><span class="line">    data_writer.write_uint32(flv_data, 0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="flv-body"><a href="#flv-body" class="headerlink" title="flv body"></a>flv body</h2><blockquote>
+<p>注意<br>如果是要构造flv文件，写入header之后就可以写入script tag了。<br>如果是使用rtmp协议，则无需构造header，也无需script tag。可直接写入 video tag和audio tag。<br>若使用rtmp协议必须在首帧写入AVCDecoderConfigurationRecord (包含sps pps数据)和 AudioSpecificConfig，否则服务端无法正常解析音视频数据。</p>
+</blockquote>
+<p>flv的body是由一个接一个的tag构成的。<br>一个flv tag分为3部分：tag header + tag body + tag data size。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">extern void aw_write_flv_tag(aw_data **flv_data, aw_flv_common_tag *common_tag)&#123;</span><br><span class="line">    //写入header</span><br><span class="line">    aw_write_tag_header(flv_data, common_tag);</span><br><span class="line">    //写入body</span><br><span class="line">    aw_write_tag_body(flv_data, common_tag);</span><br><span class="line">    //写入data size</span><br><span class="line">    aw_write_tag_data_size(flv_data, common_tag);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="tag-header"><a href="#tag-header" class="headerlink" title="tag header"></a>tag header</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">static void aw_write_tag_header(aw_data **flv_data, aw_flv_common_tag *common_tag)&#123;</span><br><span class="line">    //header 长度为固定11个字节</span><br><span class="line">    //写入tag type，video：9 audio：8 script：18</span><br><span class="line">    data_writer.write_uint8(flv_data, common_tag-&gt;tag_type);</span><br><span class="line">    //写入body的size(data_size为整个tag的长度)</span><br><span class="line">    data_writer.write_uint24(flv_data, common_tag-&gt;data_size - 11);</span><br><span class="line">    //写入时间戳</span><br><span class="line">    data_writer.write_uint24(flv_data, common_tag-&gt;timestamp);</span><br><span class="line">    data_writer.write_uint8(flv_data, common_tag-&gt;timestamp_extend);</span><br><span class="line">    //写入stream id为0</span><br><span class="line">    data_writer.write_uint24(flv_data, common_tag-&gt;stream_id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="script-tag-body"><a href="#script-tag-body" class="headerlink" title="script tag body"></a>script tag body</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">static void aw_write_script_tag_body(aw_data **flv_data, aw_flv_script_tag *script_tag)&#123;</span><br><span class="line">    //script tag写入规则为：类型-内容-类型-内容...类型-内容</span><br><span class="line">    //类型是1个字节整数，可取12种值：</span><br><span class="line">    //    0 = Number type</span><br><span class="line">    //    1 = Boolean type</span><br><span class="line">    //    2 = String type</span><br><span class="line">    //    3 = Object type</span><br><span class="line">    //    4 = MovieClip type</span><br><span class="line">    //    5 = Null type</span><br><span class="line">    //    6 = Undefined type</span><br><span class="line">    //    7 = Reference type</span><br><span class="line">    //    8 = ECMA array type</span><br><span class="line">    //    10 = Strict array type</span><br><span class="line">    //    11 = Date type</span><br><span class="line">    //    12 = Long string type</span><br><span class="line">    // 比如：如果类型是字符串，那么先写入1个字节表类型的2。另，写入真正的字符串前，需要写入2个字节的字符串长度。</span><br><span class="line">    // data_writer.write_string能够在写入字符串前，先写入字符串长度，此函数第三个参数表示用多少字节来存储字符串长度。</span><br><span class="line">    // script tag 的结构基本上是固定的，首先写入一个字符串: onMetaData，然后写入一个数组。</span><br><span class="line">    // 写入数组需要先写入数组编号1字节：8，然后写入数组长度4字节：11。</span><br><span class="line">    // 数组同OC的Dictionary类似，可写入一个字符串+一个value。</span><br><span class="line">    // 所以每个数组元素可先写入一个字符串，然后写入一个Number Type，再写入具体的数值。</span><br><span class="line">    // 结束时需写入3个字节的0x000009表示数组结束。</span><br><span class="line">    // 下面代码中的duration/width/filesize均遵循此规则。</span><br><span class="line"></span><br><span class="line">    //2表示类型，字符串</span><br><span class="line">    data_writer.write_uint8(flv_data, 2);</span><br><span class="line">    data_writer.write_string(flv_data, &quot;onMetaData&quot;, 2);</span><br><span class="line">    </span><br><span class="line">    //数组类型：8</span><br><span class="line">    data_writer.write_uint8(flv_data, 8);</span><br><span class="line">    //数组长度：11</span><br><span class="line">    data_writer.write_uint32(flv_data, 11);</span><br><span class="line">    </span><br><span class="line">    //写入duration 0表示double，1表示uint8</span><br><span class="line">    data_writer.write_string(flv_data, &quot;duration&quot;, 2);</span><br><span class="line">    data_writer.write_uint8(flv_data, 0);</span><br><span class="line">    data_writer.write_double(flv_data, script_tag-&gt;duration);</span><br><span class="line">    //写入width</span><br><span class="line">    data_writer.write_string(flv_data, &quot;width&quot;, 2);</span><br><span class="line">    data_writer.write_uint8(flv_data, 0);</span><br><span class="line">    data_writer.write_double(flv_data, script_tag-&gt;width);</span><br><span class="line">    ...</span><br><span class="line">    ...</span><br><span class="line">    ...</span><br><span class="line">    //写入file_size</span><br><span class="line">    data_writer.write_string(flv_data, &quot;filesize&quot;, 2);</span><br><span class="line">    data_writer.write_uint8(flv_data, 0);</span><br><span class="line">    data_writer.write_double(flv_data, script_tag-&gt;file_size);</span><br><span class="line">    </span><br><span class="line">    //3字节的0x9表示数组结束</span><br><span class="line">    data_writer.write_uint24(flv_data, 9);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="video-tag-body"><a href="#video-tag-body" class="headerlink" title="video tag body"></a>video tag body</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">static void aw_write_video_tag_body(aw_data **flv_data, aw_flv_video_tag *video_tag)&#123;</span><br><span class="line">    // video tag body 结构是这样的：</span><br><span class="line">    // frame_type(4bit) + codec_id(4bit) + h264_package_type(8bit) + h264_composition_time(24bit) + video_tag_data(many bits)</span><br><span class="line">    // frame_type 表示是否关键帧，关键帧为1，非关键帧为2（当然还有更多取值，请参考[flv协议](https://wuyuans.com/img/2012/08/video_file_format_spec_v10.rar)</span><br><span class="line">    // codec_id 表示视频协议：h264是7 h263是2。</span><br><span class="line">    // h264_package_type表示视频帧数据的类型，2种取值：sequence header（也就是前面说的 sps pps 数据，rtmp要求首帧发送此数据，也称为AVCDecoderConfigurationRecord），另一种为nalu，正常的h264视频帧。</span><br><span class="line">    // h264_compsition_time：cts是pts与dts的差值，flv中的timestamp表示的应该是pts。如果h264数据中不包含B帧，那么此数据可传0。</span><br><span class="line">    // video_tag_data 即纯264数据。</span><br><span class="line"></span><br><span class="line">    uint8_t video_header = 0;</span><br><span class="line">    video_header |= video_tag-&gt;frame_type &lt;&lt; 4 &amp; 0xf0;</span><br><span class="line">    video_header |= video_tag-&gt;codec_id;</span><br><span class="line">    data_writer.write_uint8(flv_data, video_header);</span><br><span class="line">    </span><br><span class="line">    if (video_tag-&gt;codec_id == aw_flv_v_codec_id_H264) &#123;</span><br><span class="line">        data_writer.write_uint8(flv_data, video_tag-&gt;h264_package_type);</span><br><span class="line">        data_writer.write_uint24(flv_data, video_tag-&gt;h264_composition_time);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    switch (video_tag-&gt;h264_package_type) &#123;</span><br><span class="line">        case aw_flv_v_h264_packet_type_seq_header: &#123;</span><br><span class="line">            data_writer.write_bytes(flv_data, video_tag-&gt;config_record_data-&gt;data, video_tag-&gt;config_record_data-&gt;size);</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        case aw_flv_v_h264_packet_type_nalu: &#123;</span><br><span class="line">            data_writer.write_bytes(flv_data, video_tag-&gt;frame_data-&gt;data, video_tag-&gt;frame_data-&gt;size);</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        case aw_flv_v_h264_packet_type_end_of_seq: &#123;</span><br><span class="line">            //nothing</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="audio-tag-body"><a href="#audio-tag-body" class="headerlink" title="audio tag body"></a>audio tag body</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">static void aw_write_audio_tag_body(aw_data **flv_data, aw_flv_audio_tag *audio_tag)&#123;</span><br><span class="line">    // audio tag body的结构是这样的：</span><br><span class="line">    // sound_format(4bit) + sound_rate(sample_rate)(2bit) + sound_size(sample_size)(1bit) + sound_type(1bit) + aac_packet_type(8bit) + aac_data(many bits)</span><br><span class="line">    // sound_format 表示声音格式，2表示mp3，10表示aac，一般是aac</span><br><span class="line">    // sound_rate 采样率，表示1秒钟采集多少个样本，可选4个值，0表示5.5kHZ，1表示11kHZ，2表示22kHZ，3表示44kHZ，一般是3。</span><br><span class="line">    // sound_size 采样尺寸，单个样本的size。2个选择，0表示8bit，1表示16bit。</span><br><span class="line">    // 直观上看，采样率和采样尺寸应该和质量有一定关系。采样率高，采样尺寸大效果应该会好，但是生成的数据量也大。</span><br><span class="line">    // sound_type 表示声音类型，0表示单声道，1表示立体声。(立体声有2条声道)。</span><br><span class="line">    // aac_packet_type表示aac数据类型，有2种选择：0表示sequence header，即 必须首帧发送的数据(AudioSpecificConfig)，1表示正常的aac数据。</span><br><span class="line"></span><br><span class="line">    uint8_t audio_header = 0;</span><br><span class="line">    audio_header |= audio_tag-&gt;sound_format &lt;&lt; 4 &amp; 0xf0;</span><br><span class="line">    audio_header |= audio_tag-&gt;sound_rate &lt;&lt; 2 &amp; 0xc;</span><br><span class="line">    audio_header |= audio_tag-&gt;sound_size &lt;&lt; 1 &amp; 0x2;</span><br><span class="line">    audio_header |= audio_tag-&gt;sound_type &amp; 0x1;</span><br><span class="line">    data_writer.write_uint8(flv_data, audio_header);</span><br><span class="line">    </span><br><span class="line">    if (audio_tag-&gt;sound_format == aw_flv_a_codec_id_AAC) &#123;</span><br><span class="line">        data_writer.write_uint8(flv_data, audio_tag-&gt;aac_packet_type);</span><br><span class="line">    &#125;</span><br><span class="line">    switch (audio_tag-&gt;aac_packet_type) &#123;</span><br><span class="line">        case aw_flv_a_aac_package_type_aac_sequence_header: &#123;</span><br><span class="line">            data_writer.write_bytes(flv_data, audio_tag-&gt;config_record_data-&gt;data, audio_tag-&gt;config_record_data-&gt;size);</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        case aw_flv_a_aac_package_type_aac_raw: &#123;</span><br><span class="line">            data_writer.write_bytes(flv_data, audio_tag-&gt;frame_data-&gt;data, audio_tag-&gt;frame_data-&gt;size);</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="tag-data-size"><a href="#tag-data-size" class="headerlink" title="tag data size"></a>tag data size</h2><p>根据flv协议，每个flv tag结束时，需要写入此tag的全部长度：header+body的长度，header长度固定为11字节，而body的长度可通过上面构造body时写入的数据进行计算。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">static void aw_write_tag_data_size(aw_data **flv_data, aw_flv_common_tag *common_tag)&#123;</span><br><span class="line">    data_writer.write_uint32(flv_data, common_tag-&gt;data_size);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的data_size由外部使用此模块的函数，在创建tag时计算出来的。<br>可以看aw_sw_faac_encoder.c中的aw_encoder_create_audio_tag方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">extern aw_flv_audio_tag *aw_encoder_create_audio_tag(int8_t *aac_data, long len, uint32_t timeStamp, aw_faac_config *faac_cfg)&#123;</span><br><span class="line">    aw_flv_audio_tag *audio_tag = aw_sw_encoder_create_flv_audio_tag(faac_cfg);</span><br><span class="line">    ...</span><br><span class="line">    ...</span><br><span class="line">    //此处计算的data_size长度为 11(tag header size) + body header size(即下面的header_size，表示body中除去aac data的部分) + aac data size</span><br><span class="line">    audio_tag-&gt;common_tag.data_size = audio_tag-&gt;frame_data-&gt;size + 11 + audio_tag-&gt;common_tag.header_size;</span><br><span class="line">    return audio_tag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这是本项目的处理方式。当然data size也可以在写入header和body时，同步计算出来。</p>
+<h2 id="flv时间戳"><a href="#flv时间戳" class="headerlink" title="flv时间戳"></a>flv时间戳</h2><p>flv的tag中有2个字段表示时间戳，一个是 timestamp(pts)，一个是Composition Time(cts)。<br>pts表示展示时间戳，表示这一帧什么时候展示。<br>说cts之前有必要介绍一下dts，dts表示解码时间戳。<br>我们知道h264中有3种视频帧，I帧，P帧，B帧。<br>I和P帧不必说。<br>因为B帧的存在，可能会令后面的视频帧先于前面的视频帧解析，这样就需要在视频帧信息中保存dts。<br>flv中的cts可以做这件事情，cts = pts - dts。</p>
+<p>另一个问题是，rtmp中的flv时间戳有一个规则就是，音频+视频帧须按照pts递增顺序发送。<br>因为音频和视频有各自的帧率，每个音视频帧可计算出各自的时间戳。<br>由于音频和视频在不同的线程中编码，编码后的音视频会合并到相同的线程中发送。<br>因为编码速度等各种原因，编码后的数据合并到相同线程时，可能并不是按照时间戳升序排列的。</p>
+<p>为了保证排序，有2种办法解决此问题:</p>
+<ol>
+<li>将数据缓存起来，每次发送前都保证发送的是最早的数据帧。</li>
+<li>以音频（或视频）为主，一旦遇到视频（或音频）帧时间戳小于已经发送的时间戳，则调整视频（或音频）帧时间戳。</li>
+</ol>
+<h2 id="推流时保存发送的flv文件"><a href="#推流时保存发送的flv文件" class="headerlink" title="推流时保存发送的flv文件"></a>推流时保存发送的flv文件</h2><p>根据本文介绍，我们可以把发送到rtmp服务器的数据保存到本地flv文件。<br>可以修改aw_streamer.c文件。</p>
+<ol>
+<li>当调用aw_streamer_open_rtmp_context时创建aw_data，并写入flv header和flv script tag。</li>
+<li>调用aw_streamer_send_video_data和aw_streamer_send_audio_data时，将video tag和audio tag写入aw_data中。</li>
+<li>当调用aw_streamer_close_rtmp_context时，将aw_data写入到本地文件，保存成flv格式，然后释放aw_data。</li>
+</ol>
+<p>至此，flv编码介绍完毕。</p>
+<h2 id="文章列表"><a href="#文章列表" class="headerlink" title="文章列表"></a>文章列表</h2><ol>
+<li><a href="/2016/11/07/1小时学会：最简单的iOS直播推流（一）介绍/">1小时学会：最简单的iOS直播推流（一）项目介绍</a></li>
+<li><a href="/2016/11/10/1小时学会：最简单的iOS直播推流（二）代码架构概述/">1小时学会：最简单的iOS直播推流（二）代码架构概述</a></li>
+<li><a href="/2016/11/14/1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频数据/">1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜/">1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取/">1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取</a></li>
+<li><a href="/2016/11/24/1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍/">1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍</a></li>
+<li><a href="/2016/12/07/1小时学会：最简单的iOS直播推流（七）h264-aac-硬编码/">1小时学会：最简单的iOS直播推流（七）h264/aac 硬编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（八）h264-aac-软编码/">1小时学会：最简单的iOS直播推流（八）h264/aac 软编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（九）flv-编码与音视频时间戳同步/">1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十）librtmp使用介绍/">1小时学会：最简单的iOS直播推流（十）librtmp使用介绍</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十一）sps-amp-pps和AudioSpecificConfig介绍（完结）/">1小时学会：最简单的iOS直播推流（十一）sps&amp;pps和AudioSpecificConfig介绍（完结）</a></li>
+<li><a href="/2017/01/25/1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里/">1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里</a></li>
+</ol>
+
+    </div>
+
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">hardman</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十）librtmp使用介绍/" class="pre-post btn btn-default" title='1小时学会：最简单的iOS直播推流（十）librtmp使用介绍 '>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（十）librtmp使用介绍 </span>
+        </a>
+    
+    
+        <a href="/2017/11/23/1小时学会：最简单的iOS直播推流（八）h264-aac-软编码/" class="next-post btn btn-default" title='1小时学会：最简单的iOS直播推流（八）h264/aac 软编码 '>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（八）h264/aac 软编码 </span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+    
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'kL6uvsjGUgAWOmaJfW8iYNYz-gzGzoHsz',
+            appKey: 'X0NBsfhG3fTX42b6xpCLsvsP',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: false,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: 'zh-CN'.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#flv格式简介"><span class="toc-text">flv格式简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码解析"><span class="toc-text">代码解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#aw-data"><span class="toc-text">aw_data</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#flv-header"><span class="toc-text">flv header</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#flv-body"><span class="toc-text">flv body</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tag-header"><span class="toc-text">tag header</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#script-tag-body"><span class="toc-text">script tag body</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#video-tag-body"><span class="toc-text">video tag body</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#audio-tag-body"><span class="toc-text">audio tag body</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tag-data-size"><span class="toc-text">tag data size</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#flv时间戳"><span class="toc-text">flv时间戳</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#推流时保存发送的flv文件"><span class="toc-text">推流时保存发送的flv文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文章列表"><span class="toc-text">文章列表</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"> 
+                <span>Copyright &copy; 2018
+                </span> | 
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> | 
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+
+</body>
+</html>

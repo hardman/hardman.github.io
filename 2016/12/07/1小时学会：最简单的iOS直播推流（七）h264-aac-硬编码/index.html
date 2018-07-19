@@ -1,0 +1,349 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="hardman的blog">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="https://hardman.github.io">
+    <!--SEO-->
+
+<meta name="description" content="iOS，web，游戏技术探索"/>
+
+
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+
+<title>1小时学会：最简单的iOS直播推流（七）h264/aac 硬编码  | hardman的blog</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="hardman的blog" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1274215625 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1274215625%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpeg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='hardman'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> iOS开发，对web和游戏开发也有些许兴趣~ </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://hardman.github.io">hardman的blog</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                                <div id="menu-line-0"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS/"><i class="fa "></i>iOS</a>
+                                <div id="menu-line-1"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS推流/"><i class="fa "></i>iOS推流</a>
+                                <div id="menu-line-2"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/cocos/"><i class="fa "></i>cocos</a>
+                                <div id="menu-line-3"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>归档</a>
+                                <div id="menu-line-4"></div>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="1小时学会：最简单的iOS直播推流（七）h264/aac 硬编码 ">
+            
+	            1小时学会：最简单的iOS直播推流（七）h264/aac 硬编码 
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/iOS推流">
+            iOS推流
+        </a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/iOS" title='iOS'>
+                        iOS
+                    </a>
+                
+                    <a href="/tags/iOS推流" title='iOS推流'>
+                        iOS推流
+                    </a>
+                
+                    <a href="/tags/源码" title='源码'>
+                        源码
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2016/12/07</span>
+        </span>
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>最简单的iOS 推流代码，视频捕获，软编码(faac，x264)，硬编码（aac，h264），美颜，flv编码，rtmp协议，陆续更新代码解析，你想学的知识这里都有，愿意懂直播技术的同学快来看！！</p>
+</blockquote>
+<blockquote>
+<p>源代码：<a href="https://github.com/hardman/AWLive" target="_blank" rel="noopener">https://github.com/hardman/AWLive</a></p>
+</blockquote>
+<p>前面已经介绍了如何从硬件设备获取到音视频数据（pcm，NV12）。</p>
+<p>但是我们需要的视频格式是 aac和 h264。</p>
+<p>现在就介绍一下如何将pcm编码aac，将NV12数据编码为h264。</p>
+<p>编码分为软编码和硬编码。</p>
+<p>硬编码是系统提供的，由系统专门嵌入的硬件设备处理音视频编码，主要计算操作在对应的硬件中。硬编码的特点是，速度快，cpu占用少，但是不够灵活，只能使用一些特定的功能。</p>
+<p>软编码是指，通过代码计算进行数据编码，主要计算操作在cpu中。软编码的特点是，灵活，多样，功能丰富可扩展，但是cpu占用较多。</p>
+<p>在代码中，编码器是通过AWEncoderManager获取的。</p>
+<p>AWENcoderManager是一个工厂，通过audioEncoderType和videoEncoderType指定编码器类型。</p>
+<p>编码器分为两类，音频编码器（AWAudioEncoder），视频编码器（AWVideoEncoder）。</p>
+<p>音视频编码器又分别分为硬编码（在HW目录中）和软编码（在SW目录中）。</p>
+<p>所以编码部分主要有4个文件：硬编码H264（AWHWH264Encoder），硬编码AAC（AWHWAACEncoder），软编码AAC（AWSWFaacEncoder），软编码H264（AWSWX264Encoder）</p>
+<h2 id="硬编码H264"><a href="#硬编码H264" class="headerlink" title="硬编码H264"></a>硬编码H264</h2><p>第一步，开启硬编码器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">-(void)open&#123;</span><br><span class="line">    //创建 video encode session</span><br><span class="line">    // 创建 video encode session</span><br><span class="line">    // 传入视频宽高，编码类型：kCMVideoCodecType_H264</span><br><span class="line">    // 编码回调：vtCompressionSessionCallback，这个回调函数为编码结果回调，编码成功后，会将数据传入此回调中。</span><br><span class="line">    // (__bridge void * _Nullable)(self)：这个参数会被原封不动地传入vtCompressionSessionCallback中，此参数为编码回调同外界通信的唯一参数。</span><br><span class="line">    // &amp;_vEnSession，c语言可以给传入参数赋值。在函数内部会分配内存并初始化_vEnSession。</span><br><span class="line">    OSStatus status = VTCompressionSessionCreate(NULL, (int32_t)(self.videoConfig.pushStreamWidth), (int32_t)self.videoConfig.pushStreamHeight, kCMVideoCodecType_H264, NULL, NULL, NULL, vtCompressionSessionCallback, (__bridge void * _Nullable)(self), &amp;_vEnSession);</span><br><span class="line">    if (status == noErr) &#123;</span><br><span class="line">        // 设置参数</span><br><span class="line">        // ProfileLevel，h264的协议等级，不同的清晰度使用不同的ProfileLevel。</span><br><span class="line">        VTSessionSetProperty(_vEnSession, kVTCompressionPropertyKey_ProfileLevel, kVTProfileLevel_H264_Main_AutoLevel);</span><br><span class="line">        // 设置码率</span><br><span class="line">        VTSessionSetProperty(_vEnSession, kVTCompressionPropertyKey_AverageBitRate, (__bridge CFTypeRef)@(self.videoConfig.bitrate));</span><br><span class="line">        // 设置实时编码</span><br><span class="line">        VTSessionSetProperty(_vEnSession, kVTCompressionPropertyKey_RealTime, kCFBooleanTrue);</span><br><span class="line">        // 关闭重排Frame，因为有了B帧（双向预测帧，根据前后的图像计算出本帧）后，编码顺序可能跟显示顺序不同。此参数可以关闭B帧。</span><br><span class="line">        VTSessionSetProperty(_vEnSession, kVTCompressionPropertyKey_AllowFrameReordering, kCFBooleanFalse);</span><br><span class="line">        // 关键帧最大间隔，关键帧也就是I帧。此处表示关键帧最大间隔为2s。</span><br><span class="line">        VTSessionSetProperty(_vEnSession, kVTCompressionPropertyKey_MaxKeyFrameInterval, (__bridge CFTypeRef)@(self.videoConfig.fps * 2));</span><br><span class="line">        // 关于B帧 P帧 和I帧，请参考：http://blog.csdn.net/abcjennifer/article/details/6577934</span><br><span class="line">        </span><br><span class="line">        //参数设置完毕，准备开始，至此初始化完成，随时来数据，随时编码</span><br><span class="line">        status = VTCompressionSessionPrepareToEncodeFrames(_vEnSession);</span><br><span class="line">        if (status != noErr) &#123;</span><br><span class="line">            [self onErrorWithCode:AWEncoderErrorCodeVTSessionPrepareFailed des:@&quot;硬编码vtsession prepare失败&quot;];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        [self onErrorWithCode:AWEncoderErrorCodeVTSessionCreateFailed des:@&quot;硬编码vtsession创建失败&quot;];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第二步，向编码器丢数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">//这里的参数yuvData就是从相机获取的NV12数据。</span><br><span class="line">-(aw_flv_video_tag *)encodeYUVDataToFlvTag:(NSData *)yuvData&#123;</span><br><span class="line">    if (!_vEnSession) &#123;</span><br><span class="line">        return NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    //yuv 变成 转CVPixelBufferRef</span><br><span class="line">    OSStatus status = noErr;</span><br><span class="line">    </span><br><span class="line">    //视频宽度</span><br><span class="line">    size_t pixelWidth = self.videoConfig.pushStreamWidth;</span><br><span class="line">    //视频高度</span><br><span class="line">    size_t pixelHeight = self.videoConfig.pushStreamHeight;</span><br><span class="line"></span><br><span class="line">    //现在要把NV12数据放入 CVPixelBufferRef中，因为 硬编码主要调用VTCompressionSessionEncodeFrame函数，此函数不接受yuv数据，但是接受CVPixelBufferRef类型。</span><br><span class="line">    CVPixelBufferRef pixelBuf = NULL;</span><br><span class="line">    //初始化pixelBuf，数据类型是kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange，此类型数据格式同NV12格式相同。</span><br><span class="line">    CVPixelBufferCreate(NULL, pixelWidth, pixelHeight, kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange, NULL, &amp;pixelBuf);</span><br><span class="line">    </span><br><span class="line">    // Lock address，锁定数据，应该是多线程防止重入操作。</span><br><span class="line">    if(CVPixelBufferLockBaseAddress(pixelBuf, 0) != kCVReturnSuccess)&#123;</span><br><span class="line">        [self onErrorWithCode:AWEncoderErrorCodeLockSampleBaseAddressFailed des:@&quot;encode video lock base address failed&quot;];</span><br><span class="line">        return NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //将yuv数据填充到CVPixelBufferRef中</span><br><span class="line">    size_t y_size = pixelWidth * pixelHeight;</span><br><span class="line">    size_t uv_size = y_size / 4;</span><br><span class="line">    uint8_t *yuv_frame = (uint8_t *)yuvData.bytes;</span><br><span class="line">    </span><br><span class="line">    //处理y frame</span><br><span class="line">    uint8_t *y_frame = CVPixelBufferGetBaseAddressOfPlane(pixelBuf, 0);</span><br><span class="line">    memcpy(y_frame, yuv_frame, y_size);</span><br><span class="line">    </span><br><span class="line">    uint8_t *uv_frame = CVPixelBufferGetBaseAddressOfPlane(pixelBuf, 1);</span><br><span class="line">    memcpy(uv_frame, yuv_frame + y_size, uv_size * 2);</span><br><span class="line">    </span><br><span class="line">    //硬编码 CmSampleBufRef</span><br><span class="line">    </span><br><span class="line">    //时间戳</span><br><span class="line">    uint32_t ptsMs = self.manager.timestamp + 1; //self.vFrameCount++ * 1000.f / self.videoConfig.fps;</span><br><span class="line">    </span><br><span class="line">    CMTime pts = CMTimeMake(ptsMs, 1000);</span><br><span class="line">    </span><br><span class="line">    //硬编码主要其实就这一句。将携带NV12数据的PixelBuf送到硬编码器中，进行编码。</span><br><span class="line">    status = VTCompressionSessionEncodeFrame(_vEnSession, pixelBuf, pts, kCMTimeInvalid, NULL, pixelBuf, NULL);</span><br><span class="line"></span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第三步，通过硬编码回调获取h264数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">static void vtCompressionSessionCallback (void * CM_NULLABLE outputCallbackRefCon,</span><br><span class="line">                                          void * CM_NULLABLE sourceFrameRefCon,</span><br><span class="line">                                          OSStatus status,</span><br><span class="line">                                          VTEncodeInfoFlags infoFlags,</span><br><span class="line">                                          CM_NULLABLE CMSampleBufferRef sampleBuffer )&#123;</span><br><span class="line">    //通过outputCallbackRefCon获取AWHWH264Encoder的对象指针，将编码好的h264数据传出去。</span><br><span class="line">    AWHWH264Encoder *encoder = (__bridge AWHWH264Encoder *)(outputCallbackRefCon);</span><br><span class="line"></span><br><span class="line">    //判断是否编码成功</span><br><span class="line">    if (status != noErr) &#123;</span><br><span class="line">        dispatch_semaphore_signal(encoder.vSemaphore);</span><br><span class="line">        [encoder onErrorWithCode:AWEncoderErrorCodeEncodeVideoFrameFailed des:@&quot;encode video frame error 1&quot;];</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //是否数据是完整的</span><br><span class="line">    if (!CMSampleBufferDataIsReady(sampleBuffer)) &#123;</span><br><span class="line">        dispatch_semaphore_signal(encoder.vSemaphore);</span><br><span class="line">        [encoder onErrorWithCode:AWEncoderErrorCodeEncodeVideoFrameFailed des:@&quot;encode video frame error 2&quot;];</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //是否是关键帧，关键帧和非关键帧要区分清楚。推流时也要注明。 </span><br><span class="line">    BOOL isKeyFrame = !CFDictionaryContainsKey( (CFArrayGetValueAtIndex(CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, true), 0)), kCMSampleAttachmentKey_NotSync);</span><br><span class="line">    </span><br><span class="line">    //首先获取sps 和pps</span><br><span class="line">    //sps pss 也是h264的一部分，可以认为它们是特别的h264视频帧，保存了h264视频的一些必要信息。</span><br><span class="line">    //没有这部分数据h264视频很难解析出来。</span><br><span class="line">    //数据处理时，sps pps 数据可以作为一个普通h264帧，放在h264视频流的最前面。</span><br><span class="line">    BOOL needSpsPps = NO;</span><br><span class="line">    if (!encoder.spsPpsData) &#123;</span><br><span class="line">        if (isKeyFrame) &#123;</span><br><span class="line">            //获取avcC，这就是我们想要的sps和pps数据。</span><br><span class="line">            //如果保存到文件中，需要将此数据前加上 [0 0 0 1] 4个字节，写入到h264文件的最前面。</span><br><span class="line">            //如果推流，将此数据放入flv数据区即可。</span><br><span class="line">            CMFormatDescriptionRef sampleBufFormat = CMSampleBufferGetFormatDescription(sampleBuffer);</span><br><span class="line">            NSDictionary *dict = (__bridge NSDictionary *)CMFormatDescriptionGetExtensions(sampleBufFormat);</span><br><span class="line">            encoder.spsPpsData = dict[@&quot;SampleDescriptionExtensionAtoms&quot;][@&quot;avcC&quot;];</span><br><span class="line">        &#125;</span><br><span class="line">        needSpsPps = YES;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //获取真正的视频帧数据</span><br><span class="line">    CMBlockBufferRef blockBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);</span><br><span class="line">    size_t blockDataLen;</span><br><span class="line">    uint8_t *blockData;</span><br><span class="line">    status = CMBlockBufferGetDataPointer(blockBuffer, 0, NULL, &amp;blockDataLen, (char **)&amp;blockData);</span><br><span class="line">    if (status == noErr) &#123;</span><br><span class="line">        size_t currReadPos = 0;</span><br><span class="line">        //一般情况下都是只有1帧，在最开始编码的时候有2帧，取最后一帧</span><br><span class="line">        while (currReadPos &lt; blockDataLen - 4) &#123;</span><br><span class="line">            uint32_t naluLen = 0;</span><br><span class="line">            memcpy(&amp;naluLen, blockData + currReadPos, 4);</span><br><span class="line">            naluLen = CFSwapInt32BigToHost(naluLen);</span><br><span class="line">            </span><br><span class="line">            //naluData 即为一帧h264数据。</span><br><span class="line">            //如果保存到文件中，需要将此数据前加上 [0 0 0 1] 4个字节，按顺序写入到h264文件中。</span><br><span class="line">            //如果推流，需要将此数据前加上4个字节表示数据长度的数字，此数据需转为大端字节序。</span><br><span class="line">            //关于大端和小端模式，请参考此网址：http://blog.csdn.net/hackbuteer1/article/details/7722667</span><br><span class="line">            encoder.naluData = [NSData dataWithBytes:blockData + currReadPos + 4 length:naluLen];</span><br><span class="line">            </span><br><span class="line">            currReadPos += 4 + naluLen;</span><br><span class="line">            </span><br><span class="line">            encoder.isKeyFrame = isKeyFrame;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        [encoder onErrorWithCode:AWEncoderErrorCodeEncodeGetH264DataFailed des:@&quot;got h264 data failed&quot;];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第四步，其实，此时硬编码已结束，这一步跟编码无关，将取得的h264数据，送到推流器中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">-(aw_flv_video_tag *)encodeYUVDataToFlvTag:(NSData *)yuvData&#123;</span><br><span class="line">    </span><br><span class="line">    ... ...</span><br><span class="line">    </span><br><span class="line">    if (status == noErr) &#123;</span><br><span class="line">        dispatch_semaphore_wait(self.vSemaphore, DISPATCH_TIME_FOREVER);</span><br><span class="line">        if (_naluData) &#123;</span><br><span class="line">            //此处 硬编码成功，_naluData内的数据即为h264视频帧。</span><br><span class="line">            //我们是推流，所以获取帧长度，转成大端字节序，放到数据的最前面</span><br><span class="line">            uint32_t naluLen = (uint32_t)_naluData.length;</span><br><span class="line">            //小端转大端。计算机内一般都是小端，而网络和文件中一般都是大端。大端转小端和小端转大端算法一样，就是字节序反转就行了。</span><br><span class="line">            uint8_t naluLenArr[4] = &#123;naluLen &gt;&gt; 24 &amp; 0xff, naluLen &gt;&gt; 16 &amp; 0xff, naluLen &gt;&gt; 8 &amp; 0xff, naluLen &amp; 0xff&#125;;</span><br><span class="line">            //将数据拼在一起</span><br><span class="line">            NSMutableData *mutableData = [NSMutableData dataWithBytes:naluLenArr length:4];</span><br><span class="line">            [mutableData appendData:_naluData];</span><br><span class="line"></span><br><span class="line">            //将h264数据合成flv tag，合成flvtag之后就可以直接发送到服务端了。后续会介绍</span><br><span class="line">            aw_flv_video_tag *video_tag = aw_encoder_create_video_tag((int8_t *)mutableData.bytes, mutableData.length, ptsMs, 0, self.isKeyFrame);</span><br><span class="line">            </span><br><span class="line">            //到此，编码工作完成，清除状态。</span><br><span class="line">            _naluData = nil;</span><br><span class="line">            _isKeyFrame = NO;</span><br><span class="line">            </span><br><span class="line">            CVPixelBufferUnlockBaseAddress(pixelBuf, 0);</span><br><span class="line">            </span><br><span class="line">            CFRelease(pixelBuf);</span><br><span class="line">            </span><br><span class="line">            return video_tag;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        [self onErrorWithCode:AWEncoderErrorCodeEncodeVideoFrameFailed des:@&quot;encode video frame error&quot;];</span><br><span class="line">    &#125;</span><br><span class="line">    CVPixelBufferUnlockBaseAddress(pixelBuf, 0);</span><br><span class="line">    </span><br><span class="line">    CFRelease(pixelBuf);</span><br><span class="line">    </span><br><span class="line">    return NULL;</span><br></pre></td></tr></table></figure></p>
+<p>第五步，关闭编码器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">//永远不忘记关闭释放资源。</span><br><span class="line">-(void)close&#123;</span><br><span class="line">    dispatch_semaphore_signal(self.vSemaphore);</span><br><span class="line">    </span><br><span class="line">    VTCompressionSessionInvalidate(_vEnSession);</span><br><span class="line">    _vEnSession = nil;</span><br><span class="line">    </span><br><span class="line">    self.naluData = nil;</span><br><span class="line">    self.isKeyFrame = NO;</span><br><span class="line">    self.spsPpsData = nil;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="硬编码AAC"><a href="#硬编码AAC" class="headerlink" title="硬编码AAC"></a>硬编码AAC</h2><p>硬编码AAC逻辑同H264差不多。</p>
+<h2 id="第一步，打开编码器"><a href="#第一步，打开编码器" class="headerlink" title="第一步，打开编码器"></a>第一步，打开编码器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">-(void)open&#123;</span><br><span class="line">    //创建audio encode converter也就是AAC编码器</span><br><span class="line">    //初始化一系列参数</span><br><span class="line">    AudioStreamBasicDescription inputAudioDes = &#123;</span><br><span class="line">        .mFormatID = kAudioFormatLinearPCM,</span><br><span class="line">        .mSampleRate = self.audioConfig.sampleRate,</span><br><span class="line">        .mBitsPerChannel = (uint32_t)self.audioConfig.sampleSize,</span><br><span class="line">        .mFramesPerPacket = 1,//每个包1帧</span><br><span class="line">        .mBytesPerFrame = 2,//每帧2字节</span><br><span class="line">        .mBytesPerPacket = 2,//每个包1帧也是2字节</span><br><span class="line">        .mChannelsPerFrame = (uint32_t)self.audioConfig.channelCount,//声道数，推流一般使用单声道</span><br><span class="line">        //下面这个flags的设置参照此文：http://www.mamicode.com/info-detail-986202.html</span><br><span class="line">        .mFormatFlags = kLinearPCMFormatFlagIsPacked | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsNonInterleaved,</span><br><span class="line">        .mReserved = 0</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    //设置输出格式，声道数</span><br><span class="line">    AudioStreamBasicDescription outputAudioDes = &#123;</span><br><span class="line">        .mChannelsPerFrame = (uint32_t)self.audioConfig.channelCount,</span><br><span class="line">        .mFormatID = kAudioFormatMPEG4AAC,</span><br><span class="line">        0</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    //初始化_aConverter</span><br><span class="line">    uint32_t outDesSize = sizeof(outputAudioDes);</span><br><span class="line">    AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &amp;outDesSize, &amp;outputAudioDes);</span><br><span class="line">    OSStatus status = AudioConverterNew(&amp;inputAudioDes, &amp;outputAudioDes, &amp;_aConverter);</span><br><span class="line">    if (status != noErr) &#123;</span><br><span class="line">        [self onErrorWithCode:AWEncoderErrorCodeCreateAudioConverterFailed des:@&quot;硬编码AAC创建失败&quot;];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //设置码率</span><br><span class="line">    uint32_t aBitrate = (uint32_t)self.audioConfig.bitrate;</span><br><span class="line">    uint32_t aBitrateSize = sizeof(aBitrate);</span><br><span class="line">    status = AudioConverterSetProperty(_aConverter, kAudioConverterEncodeBitRate, aBitrateSize, &amp;aBitrate);</span><br><span class="line">    </span><br><span class="line">    //查询最大输出</span><br><span class="line">    uint32_t aMaxOutput = 0;</span><br><span class="line">    uint32_t aMaxOutputSize = sizeof(aMaxOutput);</span><br><span class="line">    AudioConverterGetProperty(_aConverter, kAudioConverterPropertyMaximumOutputPacketSize, &amp;aMaxOutputSize, &amp;aMaxOutput);</span><br><span class="line">    self.aMaxOutputFrameSize = aMaxOutput;</span><br><span class="line">    if (aMaxOutput == 0) &#123;</span><br><span class="line">        [self onErrorWithCode:AWEncoderErrorCodeAudioConverterGetMaxFrameSizeFailed des:@&quot;AAC 获取最大frame size失败&quot;];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第二步，获取audio specific config，这是一个特别的flv tag，存储了使用的aac的一些关键数据，作为解析音频帧的基础。<br>在rtmp中，必须将此帧在所有音频帧之前发送。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">-(aw_flv_audio_tag *)createAudioSpecificConfigFlvTag&#123;</span><br><span class="line">    //profile，表示使用的协议</span><br><span class="line">    uint8_t profile = kMPEG4Object_AAC_LC;</span><br><span class="line">    //采样率</span><br><span class="line">    uint8_t sampleRate = 4;</span><br><span class="line">    //channel信息</span><br><span class="line">    uint8_t chanCfg = 1;</span><br><span class="line">    //将上面3个信息拼在一起，成为2字节</span><br><span class="line">    uint8_t config1 = (profile &lt;&lt; 3) | ((sampleRate &amp; 0xe) &gt;&gt; 1);</span><br><span class="line">    uint8_t config2 = ((sampleRate &amp; 0x1) &lt;&lt; 7) | (chanCfg &lt;&lt; 3);</span><br><span class="line">    </span><br><span class="line">    //将数据转成aw_data</span><br><span class="line">    aw_data *config_data = NULL;</span><br><span class="line">    data_writer.write_uint8(&amp;config_data, config1);</span><br><span class="line">    data_writer.write_uint8(&amp;config_data, config2);</span><br><span class="line">    </span><br><span class="line">    //转成flv tag</span><br><span class="line">    aw_flv_audio_tag *audio_specific_config_tag = aw_encoder_create_audio_specific_config_tag(config_data, &amp;_faacConfig);</span><br><span class="line">    </span><br><span class="line">    free_aw_data(&amp;config_data);</span><br><span class="line">    </span><br><span class="line">    //返回给调用方，准备发送</span><br><span class="line">    return audio_specific_config_tag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第三步：当从麦克风获取到音频数据时，将数据交给AAC编码器编码。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">-(aw_flv_audio_tag *)encodePCMDataToFlvTag:(NSData *)pcmData&#123;</span><br><span class="line">    self.curFramePcmData = pcmData;</span><br><span class="line">    </span><br><span class="line">    //构造输出结构体，编码器需要</span><br><span class="line">    AudioBufferList outAudioBufferList = &#123;0&#125;;</span><br><span class="line">    outAudioBufferList.mNumberBuffers = 1;</span><br><span class="line">    outAudioBufferList.mBuffers[0].mNumberChannels = (uint32_t)self.audioConfig.channelCount;</span><br><span class="line">    outAudioBufferList.mBuffers[0].mDataByteSize = self.aMaxOutputFrameSize;</span><br><span class="line">    outAudioBufferList.mBuffers[0].mData = malloc(self.aMaxOutputFrameSize);</span><br><span class="line">    </span><br><span class="line">    uint32_t outputDataPacketSize = 1;</span><br><span class="line">    </span><br><span class="line">    //执行编码，此处需要传一个回调函数aacEncodeInputDataProc，以同步的方式，在回调中填充pcm数据。</span><br><span class="line">    OSStatus status = AudioConverterFillComplexBuffer(_aConverter, aacEncodeInputDataProc, (__bridge void * _Nullable)(self), &amp;outputDataPacketSize, &amp;outAudioBufferList, NULL);</span><br><span class="line">    if (status == noErr) &#123;</span><br><span class="line">        //编码成功，获取数据</span><br><span class="line">        NSData *rawAAC = [NSData dataWithBytes: outAudioBufferList.mBuffers[0].mData length:outAudioBufferList.mBuffers[0].mDataByteSize];</span><br><span class="line">        //时间戳(ms) = 1000 * 每秒采样数 / 采样率;</span><br><span class="line">        self.manager.timestamp += 1024 * 1000 / self.audioConfig.sampleRate;</span><br><span class="line">        //获取到aac数据，转成flv audio tag，发送给服务端。</span><br><span class="line">        return aw_encoder_create_audio_tag((int8_t *)rawAAC.bytes, rawAAC.length, (uint32_t)self.manager.timestamp, &amp;_faacConfig);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        //编码错误</span><br><span class="line">        [self onErrorWithCode:AWEncoderErrorCodeAudioEncoderFailed des:@&quot;aac 编码错误&quot;];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    return NULL;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//回调函数，系统指定格式</span><br><span class="line">static OSStatus aacEncodeInputDataProc(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)&#123;</span><br><span class="line">    AWHWAACEncoder *hwAacEncoder = (__bridge AWHWAACEncoder *)inUserData;</span><br><span class="line">    //将pcm数据交给编码器</span><br><span class="line">    if (hwAacEncoder.curFramePcmData) &#123;</span><br><span class="line">        ioData-&gt;mBuffers[0].mData = (void *)hwAacEncoder.curFramePcmData.bytes;</span><br><span class="line">        ioData-&gt;mBuffers[0].mDataByteSize = (uint32_t)hwAacEncoder.curFramePcmData.length;</span><br><span class="line">        ioData-&gt;mNumberBuffers = 1;</span><br><span class="line">        ioData-&gt;mBuffers[0].mNumberChannels = (uint32_t)hwAacEncoder.audioConfig.channelCount;</span><br><span class="line">        </span><br><span class="line">        return noErr;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    return -1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第四步：关闭编码器释放资源<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">-(void)close&#123;</span><br><span class="line">    AudioConverterDispose(_aConverter);</span><br><span class="line">    _aConverter = nil;</span><br><span class="line">    self.curFramePcmData = nil;</span><br><span class="line">    self.aMaxOutputFrameSize = 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="文章列表"><a href="#文章列表" class="headerlink" title="文章列表"></a>文章列表</h2><ol>
+<li><a href="/2016/11/07/1小时学会：最简单的iOS直播推流（一）介绍/">1小时学会：最简单的iOS直播推流（一）项目介绍</a></li>
+<li><a href="/2016/11/10/1小时学会：最简单的iOS直播推流（二）代码架构概述/">1小时学会：最简单的iOS直播推流（二）代码架构概述</a></li>
+<li><a href="/2016/11/14/1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频数据/">1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜/">1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取/">1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取</a></li>
+<li><a href="/2016/11/24/1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍/">1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍</a></li>
+<li><a href="/2016/12/07/1小时学会：最简单的iOS直播推流（七）h264-aac-硬编码/">1小时学会：最简单的iOS直播推流（七）h264/aac 硬编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（八）h264-aac-软编码/">1小时学会：最简单的iOS直播推流（八）h264/aac 软编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（九）flv-编码与音视频时间戳同步/">1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十）librtmp使用介绍/">1小时学会：最简单的iOS直播推流（十）librtmp使用介绍</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十一）sps-amp-pps和AudioSpecificConfig介绍（完结）/">1小时学会：最简单的iOS直播推流（十一）sps&amp;pps和AudioSpecificConfig介绍（完结）</a></li>
+<li><a href="/2017/01/25/1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里/">1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里</a></li>
+</ol>
+
+    </div>
+
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">hardman</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2017/01/25/1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里/" class="pre-post btn btn-default" title='1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里 '>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里 </span>
+        </a>
+    
+    
+        <a href="/2016/11/24/1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍/" class="next-post btn btn-default" title='1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍 '>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍 </span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+    
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'kL6uvsjGUgAWOmaJfW8iYNYz-gzGzoHsz',
+            appKey: 'X0NBsfhG3fTX42b6xpCLsvsP',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: false,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: 'zh-CN'.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#硬编码H264"><span class="toc-text">硬编码H264</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#硬编码AAC"><span class="toc-text">硬编码AAC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#第一步，打开编码器"><span class="toc-text">第一步，打开编码器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文章列表"><span class="toc-text">文章列表</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"> 
+                <span>Copyright &copy; 2018
+                </span> | 
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> | 
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+
+</body>
+</html>

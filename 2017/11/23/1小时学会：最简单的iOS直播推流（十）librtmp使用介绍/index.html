@@ -1,0 +1,339 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="hardman的blog">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="https://hardman.github.io">
+    <!--SEO-->
+
+<meta name="description" content="iOS，web，游戏技术探索"/>
+
+
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+
+<title>1小时学会：最简单的iOS直播推流（十）librtmp使用介绍  | hardman的blog</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="hardman的blog" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1274215625 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1274215625%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpeg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='hardman'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> iOS开发，对web和游戏开发也有些许兴趣~ </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://hardman.github.io">hardman的blog</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                                <div id="menu-line-0"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS/"><i class="fa "></i>iOS</a>
+                                <div id="menu-line-1"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS推流/"><i class="fa "></i>iOS推流</a>
+                                <div id="menu-line-2"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/cocos/"><i class="fa "></i>cocos</a>
+                                <div id="menu-line-3"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>归档</a>
+                                <div id="menu-line-4"></div>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="1小时学会：最简单的iOS直播推流（十）librtmp使用介绍 ">
+            
+	            1小时学会：最简单的iOS直播推流（十）librtmp使用介绍 
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/iOS推流">
+            iOS推流
+        </a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/iOS" title='iOS'>
+                        iOS
+                    </a>
+                
+                    <a href="/tags/iOS推流" title='iOS推流'>
+                        iOS推流
+                    </a>
+                
+                    <a href="/tags/源码" title='源码'>
+                        源码
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2017/11/23</span>
+        </span>
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>最简单的iOS 推流代码，视频捕获，软编码(faac，x264)，硬编码（aac，h264），美颜，flv编码，rtmp协议，陆续更新代码解析，你想学的知识这里都有，愿意懂直播技术的同学快来看！！</p>
+</blockquote>
+<blockquote>
+<p>源代码：<a href="https://github.com/hardman/AWLive" target="_blank" rel="noopener">https://github.com/hardman/AWLive</a></p>
+</blockquote>
+<p>rtmp(一般大写，小写会被认为英文不好或不专业，iOS开发者对这一点更为敏感)协议是Adobe公司为Flash视频的实时传输开发的一个开放协议。</p>
+<p>本文不探究rtmp协议的原理，只是从代码角度来看，客户端如何使用librtmp完成推流功能。</p>
+<h2 id="librtmp"><a href="#librtmp" class="headerlink" title="librtmp"></a>librtmp</h2><p>项目内使用的librtmp是使用rtmpdump编译的。如果遇到代码上的疑问可以通过阅读rtmpdump的源码寻找答案。</p>
+<h2 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h2><h2 id="外部接口"><a href="#外部接口" class="headerlink" title="外部接口"></a>外部接口</h2><p>rtmp相关代码在aw_rtmp.c和aw_rtmp.h中。<br>对外接口包含一个context和3个函数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">//aw_rtmp_context是一个context，用于存储一些外部传入及内部共享的变量。</span><br><span class="line">//写成context统一管理，否则就要写很多全局变量了。</span><br><span class="line">typedef struct aw_rtmp_context&#123;</span><br><span class="line">    //rtmp url</span><br><span class="line">    char rtmp_url[256];</span><br><span class="line">    //librtmp 中的结构体，作为RTMP连接上下文</span><br><span class="line">    RTMP *rtmp;</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    //外部状态检测</span><br><span class="line">    //状态变化回调，注意，不要在状态回调中做释放aw_rtmp_context的操作。</span><br><span class="line">    //如果非要释放，请延迟一帧。</span><br><span class="line">    aw_rtmp_state_changed_cb state_changed_cb;</span><br><span class="line">    //当前状态</span><br><span class="line">    aw_rtmp_state rtmp_state;</span><br><span class="line">&#125; aw_rtmp_context;</span><br><span class="line"></span><br><span class="line">//打开rtmp</span><br><span class="line">extern int aw_rtmp_open(aw_rtmp_context *ctx);</span><br><span class="line"></span><br><span class="line">//写入数据</span><br><span class="line">extern int aw_rtmp_write(aw_rtmp_context *ctx, const char *buf, int size);</span><br><span class="line"></span><br><span class="line">//关闭rtmp</span><br><span class="line">extern int aw_rtmp_close(aw_rtmp_context *ctx);</span><br></pre></td></tr></table></figure></p>
+<p>3个主要函数分别是：打开，写入数据，关闭。<br>除此之外，对于外部调用者来说，最重要的是要监听rtmp连接的各种状态来调整上层逻辑。<br>而状态回调就在 aw_rtmp_context中。</p>
+<p>项目中，初始化 &amp; 关闭rtmp的代码在 aw_streamer.c 中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//初始化rtmp连接</span><br><span class="line">static int8_t aw_steamer_open_rtmp_context()&#123;</span><br><span class="line">    //创建context 传入rtmpurl及状态回调</span><br><span class="line">    if (!s_rtmp_ctx) &#123;</span><br><span class="line">        s_rtmp_ctx = alloc_aw_rtmp_context(s_rtmp_url, aw_streamer_rtmp_state_changed_callback);</span><br><span class="line">    &#125;</span><br><span class="line">    //open</span><br><span class="line">    return aw_rtmp_open(s_rtmp_ctx);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//关闭rtmp连接</span><br><span class="line">static void aw_streamer_close_rtmp_context()&#123;</span><br><span class="line">    if (s_rtmp_ctx) &#123;</span><br><span class="line">        aw_rtmp_close(s_rtmp_ctx);</span><br><span class="line">    &#125;</span><br><span class="line">    aw_log(&quot;[d] closed rtmp context&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>发送数据的代码在aw_streamer.c中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">static void aw_streamer_send_flv_tag_to_rtmp(aw_flv_common_tag *common_tag)&#123;</span><br><span class="line">    ... ...</span><br><span class="line"></span><br><span class="line">    aw_rtmp_write(s_rtmp_ctx, (const char *)s_output_buf-&gt;data, s_output_buf-&gt;size);</span><br><span class="line"></span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="打开rtmp"><a href="#打开rtmp" class="headerlink" title="打开rtmp"></a>打开rtmp</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">//打开rtmp，都是固定套路。</span><br><span class="line">int aw_rtmp_open(aw_rtmp_context *ctx)&#123;</span><br><span class="line">    ...</span><br><span class="line">    ...</span><br><span class="line">    //初始化</span><br><span class="line">    ctx-&gt;rtmp = RTMP_Alloc();</span><br><span class="line">    RTMP_Init(ctx-&gt;rtmp);</span><br><span class="line">    //连接超时</span><br><span class="line">    ctx-&gt;rtmp-&gt;Link.timeout = 1;</span><br><span class="line">    //设置url</span><br><span class="line">    if (!RTMP_SetupURL(ctx-&gt;rtmp, ctx-&gt;rtmp_url)) &#123;</span><br><span class="line">        AWLog(&quot;[error ] aw rtmp setup url = %s\n&quot;, ctx-&gt;rtmp_url);</span><br><span class="line">        recode = -2;</span><br><span class="line">        goto FAILED;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //可写</span><br><span class="line">    RTMP_EnableWrite(ctx-&gt;rtmp);</span><br><span class="line">    </span><br><span class="line">    //buffer长度</span><br><span class="line">    RTMP_SetBufferMS(ctx-&gt;rtmp, 0);</span><br><span class="line">    </span><br><span class="line">    //开始连接</span><br><span class="line">    if (!RTMP_Connect(ctx-&gt;rtmp, NULL)) &#123;</span><br><span class="line">        recode = -3;</span><br><span class="line">        goto FAILED;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //连接</span><br><span class="line">    if (!RTMP_ConnectStream(ctx-&gt;rtmp, 0)) &#123;</span><br><span class="line">        recode = -4;</span><br><span class="line">        goto FAILED;</span><br><span class="line">    &#125;</span><br><span class="line">    return 1;</span><br><span class="line">FAILED:</span><br><span class="line">    //若中间环节出错，断开连接</span><br><span class="line">    aw_rtmp_close(ctx);</span><br><span class="line">    return !recode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="rtmp写入（发送）数据"><a href="#rtmp写入（发送）数据" class="headerlink" title="rtmp写入（发送）数据"></a>rtmp写入（发送）数据</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int aw_rtmp_write(aw_rtmp_context *ctx, const char *buf, int size)&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    //RTMP_Write内部有时会排出SIGPIPE信号，在这里处理一下</span><br><span class="line">    signal(SIGPIPE, SIG_IGN);</span><br><span class="line">    int write_ret = RTMP_Write(ctx-&gt;rtmp, buf, size);</span><br><span class="line">    ... ...</span><br><span class="line">    return write_ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="rtmp关闭"><a href="#rtmp关闭" class="headerlink" title="rtmp关闭"></a>rtmp关闭</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int aw_rtmp_close(aw_rtmp_context *ctx)&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    //主要这两句</span><br><span class="line">    RTMP_Close(ctx-&gt;rtmp);</span><br><span class="line">    RTMP_Free(ctx-&gt;rtmp);</span><br><span class="line">    ... ...</span><br><span class="line">    return 1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>librtmp库使用方法介绍完毕。</p>
+<h2 id="文章列表"><a href="#文章列表" class="headerlink" title="文章列表"></a>文章列表</h2><ol>
+<li><a href="/2016/11/07/1小时学会：最简单的iOS直播推流（一）介绍/">1小时学会：最简单的iOS直播推流（一）项目介绍</a></li>
+<li><a href="/2016/11/10/1小时学会：最简单的iOS直播推流（二）代码架构概述/">1小时学会：最简单的iOS直播推流（二）代码架构概述</a></li>
+<li><a href="/2016/11/14/1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频数据/">1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜/">1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取/">1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取</a></li>
+<li><a href="/2016/11/24/1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍/">1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍</a></li>
+<li><a href="/2016/12/07/1小时学会：最简单的iOS直播推流（七）h264-aac-硬编码/">1小时学会：最简单的iOS直播推流（七）h264/aac 硬编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（八）h264-aac-软编码/">1小时学会：最简单的iOS直播推流（八）h264/aac 软编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（九）flv-编码与音视频时间戳同步/">1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十）librtmp使用介绍/">1小时学会：最简单的iOS直播推流（十）librtmp使用介绍</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十一）sps-amp-pps和AudioSpecificConfig介绍（完结）/">1小时学会：最简单的iOS直播推流（十一）sps&amp;pps和AudioSpecificConfig介绍（完结）</a></li>
+<li><a href="/2017/01/25/1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里/">1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里</a></li>
+</ol>
+
+    </div>
+
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">hardman</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十一）sps-amp-pps和AudioSpecificConfig介绍（完结）/" class="pre-post btn btn-default" title='1小时学会：最简单的iOS直播推流（十一）sps&amp;pps和AudioSpecificConfig介绍（完结） '>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（十一）sps&amp;pps和AudioSpecificConfig介绍（完结） </span>
+        </a>
+    
+    
+        <a href="/2017/11/23/1小时学会：最简单的iOS直播推流（九）flv-编码与音视频时间戳同步/" class="next-post btn btn-default" title='1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步 '>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步 </span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+    
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'kL6uvsjGUgAWOmaJfW8iYNYz-gzGzoHsz',
+            appKey: 'X0NBsfhG3fTX42b6xpCLsvsP',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: false,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: 'zh-CN'.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#librtmp"><span class="toc-text">librtmp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码解析"><span class="toc-text">代码解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#外部接口"><span class="toc-text">外部接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#打开rtmp"><span class="toc-text">打开rtmp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#rtmp写入（发送）数据"><span class="toc-text">rtmp写入（发送）数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#rtmp关闭"><span class="toc-text">rtmp关闭</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文章列表"><span class="toc-text">文章列表</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"> 
+                <span>Copyright &copy; 2018
+                </span> | 
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> | 
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+
+</body>
+</html>

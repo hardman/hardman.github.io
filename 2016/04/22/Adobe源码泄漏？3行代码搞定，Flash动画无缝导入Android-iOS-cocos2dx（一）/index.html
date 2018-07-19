@@ -1,0 +1,359 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="hardman的blog">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="https://hardman.github.io">
+    <!--SEO-->
+
+<meta name="description" content="iOS，web，游戏技术探索"/>
+
+
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+
+<title>Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（一） | hardman的blog</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="hardman的blog" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1274215625 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1274215625%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpeg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='hardman'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> iOS开发，对web和游戏开发也有些许兴趣~ </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://hardman.github.io">hardman的blog</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                                <div id="menu-line-0"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS/"><i class="fa "></i>iOS</a>
+                                <div id="menu-line-1"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS推流/"><i class="fa "></i>iOS推流</a>
+                                <div id="menu-line-2"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/cocos/"><i class="fa "></i>cocos</a>
+                                <div id="menu-line-3"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>归档</a>
+                                <div id="menu-line-4"></div>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（一）">
+            
+	            Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（一）
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/iOS">
+            iOS
+        </a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/iOS" title='iOS'>
+                        iOS
+                    </a>
+                
+                    <a href="/tags/动画" title='动画'>
+                        动画
+                    </a>
+                
+                    <a href="/tags/flash" title='flash'>
+                        flash
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2016/04/22</span>
+        </span>
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <p><strong>[注] iOS代码已重构，效率提升90%，200层动画不卡。[2016.10.27]</strong></p>
+<h2 id="项目介绍"><a href="#项目介绍" class="headerlink" title=" 项目介绍"></a> 项目介绍</h2><p>项目名称：<a href="https://github.com/hardman/FlashAnimationToMobile" target="_blank" rel="noopener">FlashAnimationToMobile 源码</a>。     <a href="http://blog.csdn.net/hard_man/article/details/51222696" target="_blank" rel="noopener">使用方法点这里</a>。</p>
+<p>这是一个把flash中的关键帧动画(不是序列帧)导出，然后在iOS／Android原生应用中解析并播放的一个插件。除了原生App，它也能够支持Cocos2dx（3.x）。</p>
+<p>对于Flash软件，则支持Flash CS3及以上版本及最新的Animate CC。</p>
+<p>这个库能够满足游戏，App开发中90%的2D动画需求。<br>它可以用来做游戏中的人物动画：走动，攻击，跳跃，闪避等，以及UI特效，升级，转场等。<br>也可以用于App动画：秀场礼物，用户升级，活动礼包，等等。</p>
+<p>这个库目前已在3个线上项目(2个游戏，一个App: android+iOS)中使用了。<br>它最大的特点就是：原生，关键帧动画。</p>
+<p>实际效果如下：</p>
+<ul>
+<li><p>flash:<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/gifs/flash.gif?raw=true" width="600"></p>
+</li>
+<li><p>iOS:<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/gifs/iOS.gif?raw=true" width="300/"></p>
+</li>
+<li><p>android:<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/gifs/android.gif?raw=true" width="300/"></p>
+</li>
+<li><p>cocos2dx:<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/gifs/cocos2dx.gif?raw=true" width="600/"></p>
+<p>项目来由</p>
+</li>
+</ul>
+<hr>
+<p>最开始有把flash关键帧动画导出的想法是当初做cocos2dx开发游戏的时候。<br>当时开发的一个游戏项目，模仿《刀塔传奇》的动画样式和战斗模式。<br>了解的朋友应该知道，《刀塔传奇》里面有很多英雄，每个英雄都有很多个动作。<br>一般情况下，这种复杂动画应该避免使用序列帧动画(对内存要求高)，而应该用更高效的关键帧动画。<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/gifs/dt1.gif?raw=true" width="200/"><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/gifs/dt2.gif?raw=true" width="200/"><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/gifs/dt3.gif?raw=true" width="200/"></p>
+<p>而当初立项的时候，项目组的美术人员对flash比较熟悉，希望用flash来做各个英雄的动画。更能节约时间。<br>而cocos2dx当时还不能直接导入flash动画。<br>于是，作为程序的我，就需要查阅各种资料，想解决方案。于是就有了这个项目。</p>
+<p>我们的游戏当初45个英雄，每个英雄9个动作，全部使用flash制作，并用这个库来播放动画。同屏20个英雄，无卡顿完美运行。</p>
+<p>看下我们游戏制作的flash原图：<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/gifs/自己的dt.gif?raw=true" width="400/"></p>
+<p>过了一年，我的主要工作从游戏转移到app。现在是在做秀场项目。<br>后来大家觉得送礼物的特效不够炫，希望手机端送礼物时也能够有网页版的那种效果。<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/gifs/礼物特效.gif?raw=true" width="600/"></p>
+<p>于是我就产生了把这个cocos2dx的动画库，移植到iOS和android中的想法。就是今天介绍的这个项目了。</p>
+<p>用这个动画库来播放美术人员做出来的flash特效作为秀场礼物动画。可令礼物丰富多彩，不再单调。</p>
+<h2 id="代码实现及功能范围"><a href="#代码实现及功能范围" class="headerlink" title="代码实现及功能范围"></a>代码实现及功能范围</h2><p>代码分为两部分：</p>
+<pre><code>1. flash／python脚本
+2. 各平台（iOS/Android/cocos2dx）解析库。
+</code></pre><ul>
+<li>其中flash脚本的部分参考的是这几篇文章：<ul>
+<li><a href="http://wenku.baidu.com/view/fed5a20ce87101f69e31959e.html" target="_blank" rel="noopener">应用Flash JavaScript API解析fla文件</a></li>
+<li><a href="http://www.g168.net/txt/flash/ExtendingFlash/index.htm" target="_blank" rel="noopener">jsfl参考文档1</a><br>  <a href="http://tool.admin5.com/shouce/flash/ExtendingFlash/" target="_blank" rel="noopener">jsfl参考文档2</a></li>
+</ul>
+</li>
+<li>python脚本是为了把json数据(.flajson文件)转换成二进制数据(.flabin文件)，进一步缩小文件体积，同时带有一定的加密效果。<ul>
+<li>其中cocos2dx的项目只支持二进制格式，Android和iOS版本支持json和二进制格式。</li>
+<li>二进制格式的文件大小要比json格式小10倍左右，加载速度也比json快。</li>
+</ul>
+</li>
+</ul>
+<p>当初在cocos2dx中做程序实现的时候，我是完全把flash的运行机制在cocos2dx中复制了一遍。<br>其中包含了，元件，层和关键帧的概念。<br>到后面移植App的时候，我的思路发生了变化，我觉得把层的概念淡化，然后在任何一帧，把不同层的图片同时绘制。这种思路可能更简单一些。<br>所以App的代码实现逻辑，同cocos2dx版本的代码有一定的区别。</p>
+<p>项目中的代码是最简单的能够使用的版本，功能和限制如下：</p>
+<pre><code>- 只能用图片，不能用矢量图
+- 只能使用如下属性：位置，缩放，旋转，切变，颜色叠加，透明度变化。
+- cocos2dx版本计算content size的部分没有实现。
+- app版本我为不同分辨率手机做了适配，但是没有编写计算其size的方法，因为我没有用到。
+- 上述两点如果有这种需求，则需要自行添加这部分代码
+</code></pre><p>虽说简单，但是这个库已经能够满足90%的相关需求了。</p>
+<p>如果感兴趣，可以通过阅读资料，为其增加矢量图，滤镜，遮罩等功能。这些都是可以实现的。</p>
+<p>我在代码关键部分都加了注释。感兴趣的可以围观一下。帮忙指出错误。</p>
+<p><a href="https://github.com/hardman/FlashAnimationToMobile" target="_blank" rel="noopener">FlashAnimationToMobile 点此进入</a>。</p>
+
+    </div>
+
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">hardman</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2016/04/22/Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android-iOS-cocos2dx（二）/" class="pre-post btn btn-default" title='Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（二）'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（二）</span>
+        </a>
+    
+    
+        <a href="/2016/03/14/详解intrinsicContentSize及约束优先级contentHugging-contentCompressionResistance/" class="next-post btn btn-default" title='详解intrinsicContentSize及约束优先级contentHugging&contentCompressionResistance'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">详解intrinsicContentSize及约束优先级contentHugging&contentCompressionResistance</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+    
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'kL6uvsjGUgAWOmaJfW8iYNYz-gzGzoHsz',
+            appKey: 'X0NBsfhG3fTX42b6xpCLsvsP',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: false,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: 'zh-CN'.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#项目介绍"><span class="toc-text"> 项目介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码实现及功能范围"><span class="toc-text">代码实现及功能范围</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"> 
+                <span>Copyright &copy; 2018
+                </span> | 
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> | 
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+
+</body>
+</html>

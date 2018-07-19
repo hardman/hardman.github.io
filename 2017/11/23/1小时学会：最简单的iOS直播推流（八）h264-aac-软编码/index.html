@@ -1,0 +1,400 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="hardman的blog">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="https://hardman.github.io">
+    <!--SEO-->
+
+<meta name="description" content="iOS，web，游戏技术探索"/>
+
+
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+
+<title>1小时学会：最简单的iOS直播推流（八）h264/aac 软编码  | hardman的blog</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="hardman的blog" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1274215625 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1274215625%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpeg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='hardman'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> iOS开发，对web和游戏开发也有些许兴趣~ </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://hardman.github.io">hardman的blog</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                                <div id="menu-line-0"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS/"><i class="fa "></i>iOS</a>
+                                <div id="menu-line-1"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS推流/"><i class="fa "></i>iOS推流</a>
+                                <div id="menu-line-2"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/cocos/"><i class="fa "></i>cocos</a>
+                                <div id="menu-line-3"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>归档</a>
+                                <div id="menu-line-4"></div>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="1小时学会：最简单的iOS直播推流（八）h264/aac 软编码 ">
+            
+	            1小时学会：最简单的iOS直播推流（八）h264/aac 软编码 
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/iOS推流">
+            iOS推流
+        </a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/iOS" title='iOS'>
+                        iOS
+                    </a>
+                
+                    <a href="/tags/iOS推流" title='iOS推流'>
+                        iOS推流
+                    </a>
+                
+                    <a href="/tags/源码" title='源码'>
+                        源码
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2017/11/23</span>
+        </span>
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>最简单的iOS 推流代码，视频捕获，软编码(faac，x264)，硬编码（aac，h264），美颜，flv编码，rtmp协议，陆续更新代码解析，你想学的知识这里都有，愿意懂直播技术的同学快来看！！</p>
+</blockquote>
+<blockquote>
+<p>源代码：<a href="https://github.com/hardman/AWLive" target="_blank" rel="noopener">https://github.com/hardman/AWLive</a></p>
+</blockquote>
+<p>软编码包含3部分内容：</p>
+<ol>
+<li>将pcm/yuv数据编码成aac/h264格式</li>
+<li>将aac/h264数据封装成flv格式</li>
+<li>另外无论软编码还是硬编码，最后获得的flv格式数据，需要通过rtmp协议发送至服务器。</li>
+</ol>
+<p>本篇将介绍第1部分内容。另外两部分内容将在后续文章中介绍。</p>
+<p>根据上文介绍，软编码实现，对应音频／视频编码分别为：AWSWFaacEncoder 和 AWSWX264Encoder。</p>
+<p>这两个类只是用OC封装的一个壳，实际上使用的是 libfaac 和 libx264 进行处理。</p>
+<h2 id="音频软编码"><a href="#音频软编码" class="headerlink" title="音频软编码"></a>音频软编码</h2><p>aw_faac.h和aw_faac.c这两个文件是对libfaac这个库使用方法的简单封装。<br>这两个文件预期功能是，封装出一个函数，将pcm数据，转成aac数据。</p>
+<p>faac的使用步骤：</p>
+<ol>
+<li>使用 faacEncOpen 开启编码环境 配置编码属性。</li>
+<li>使用 faacEncEncode 函数编码。</li>
+<li>使用完毕后，调用 faacEncClose 关闭编码环境。</li>
+</ol>
+<p>根据这个步骤，来看aw_faac.c文件。</p>
+<h2 id="faac封装第一步：开启编码环境"><a href="#faac封装第一步：开启编码环境" class="headerlink" title="faac封装第一步：开启编码环境"></a>faac封装第一步：开启编码环境</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">    aw_faac_context 是自己创建的结构体，用于辅助aac编码，存储了faac库的必需的数据，及一些过程变量。</span><br><span class="line">    它的创建及关闭请看demo中的代码，很简单，这里不需要解释。</span><br><span class="line">*/</span><br><span class="line">static void aw_open_faac_enc_handler(aw_faac_context *faac_ctx)&#123;</span><br><span class="line">    // 开启faac</span><br><span class="line">    // 参数依次为：</span><br><span class="line">    // 输入 采样率(44100) 声道数(2)</span><br><span class="line">    // 得到 最大输入样本数(1024) 最大输出字节数(2048)</span><br><span class="line">    faac_ctx-&gt;faac_handler = faacEncOpen(faac_ctx-&gt;config.sample_rate, faac_ctx-&gt;config.channel_count, &amp;faac_ctx-&gt;max_input_sample_count, &amp;faac_ctx-&gt;max_output_byte_count);</span><br><span class="line">    </span><br><span class="line">    //根据最大输入样本数得到最大输入字节数</span><br><span class="line">    faac_ctx-&gt;max_input_byte_count = faac_ctx-&gt;max_input_sample_count * faac_ctx-&gt;config.sample_size / 8;</span><br><span class="line">    </span><br><span class="line">    if(!faac_ctx-&gt;faac_handler)&#123;</span><br><span class="line">        aw_log(&quot;[E] aac handler open failed&quot;);</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //创建buffer</span><br><span class="line">    faac_ctx-&gt;aac_buffer = aw_alloc(faac_ctx-&gt;max_output_byte_count);</span><br><span class="line">    </span><br><span class="line">    //获取配置</span><br><span class="line">    faacEncConfigurationPtr faac_config = faacEncGetCurrentConfiguration(faac_ctx-&gt;faac_handler);</span><br><span class="line">    if (faac_ctx-&gt;config.sample_size == 16) &#123;</span><br><span class="line">        faac_config-&gt;inputFormat = FAAC_INPUT_16BIT;</span><br><span class="line">    &#125;else if (faac_ctx-&gt;config.sample_size == 24) &#123;</span><br><span class="line">        faac_config-&gt;inputFormat = FAAC_INPUT_24BIT;</span><br><span class="line">    &#125;else if (faac_ctx-&gt;config.sample_size == 32) &#123;</span><br><span class="line">        faac_config-&gt;inputFormat = FAAC_INPUT_32BIT;</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        faac_config-&gt;inputFormat = FAAC_INPUT_FLOAT;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //配置</span><br><span class="line">    faac_config-&gt;aacObjectType = LOW;//aac对象类型: LOW Main LTP</span><br><span class="line">    faac_config-&gt;mpegVersion = MPEG4;//mpeg版本: MPEG2 MPEG4</span><br><span class="line">    faac_config-&gt;useTns = 1;//抗噪</span><br><span class="line">    faac_config-&gt;allowMidside = 0;// 是否使用mid/side编码</span><br><span class="line">    if(faac_ctx-&gt;config.bitrate)&#123;</span><br><span class="line">        //每秒钟每个通道的bitrate</span><br><span class="line">        faac_config-&gt;bitRate = faac_ctx-&gt;config.bitrate / faac_ctx-&gt;config.channel_count;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    faacEncSetConfiguration(faac_ctx-&gt;faac_handler, faac_config);</span><br><span class="line">    </span><br><span class="line">    //获取audio specific config，本系列文章中第六篇里面介绍了这个数据，它存储了aac格式的一些关键数据，</span><br><span class="line">    //在rtmp协议中，必须将此数据在所有音频帧之前发送</span><br><span class="line">    uint8_t *audio_specific_data = NULL;</span><br><span class="line">    unsigned long audio_specific_data_len = 0;</span><br><span class="line">    faacEncGetDecoderSpecificInfo(faac_ctx-&gt;faac_handler, &amp;audio_specific_data, &amp;audio_specific_data_len);</span><br><span class="line">    </span><br><span class="line">    //将获取的audio specific config data 存储到faac_ctx中</span><br><span class="line">    if (audio_specific_data_len &gt; 0) &#123;</span><br><span class="line">        faac_ctx-&gt;audio_specific_config_data = alloc_aw_data(0);</span><br><span class="line">        memcpy_aw_data(&amp;faac_ctx-&gt;audio_specific_config_data, audio_specific_data, (uint32_t)audio_specific_data_len);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line">//函数内具体参数配置，请参考：</span><br><span class="line">//http://wenku.baidu.com/link?url=0E9GnSo7hZ-3WmB_eXz8EfnG8NqJJJtvjrVNW7hW-VEYWW-gYBMVM-CnFSicDE-veDl2tzfL-nu2FQ8msGcCOALuT8VW1l_NjQL9Gvw5V6_</span><br></pre></td></tr></table></figure>
+<h2 id="faac封装第二步：开始编码"><a href="#faac封装第二步：开始编码" class="headerlink" title="faac封装第二步：开始编码"></a>faac封装第二步：开始编码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">    pcm_data 为 pcm格式的音频数据</span><br><span class="line">    len 表示数据字节数</span><br><span class="line">*/</span><br><span class="line">extern void aw_encode_pcm_frame_2_aac(aw_faac_context *ctx, int8_t *pcm_data, long len)&#123;</span><br><span class="line">    //判断输入参数</span><br><span class="line">    if (!pcm_data || len &lt;= 0) &#123;</span><br><span class="line">        aw_log(&quot;[E] aw_encode_pcm_frame_2_aac params error&quot;);</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //清空encoded_aac_data，每次编码数据最终会存储到此字段中，所以首先清空。</span><br><span class="line">    reset_aw_data(&amp;ctx-&gt;encoded_aac_data);</span><br><span class="line">    </span><br><span class="line">    /*</span><br><span class="line">        下列代码根据第一步&quot;开启编码环境&quot;函数中计算的最大输入子节数</span><br><span class="line">        将pcm_data分割成合适的大小，使用faacEncEncode函数将pcm数据编码成aac数据。</span><br><span class="line"></span><br><span class="line">        下列代码执行完成后，编码出的aac数据将会存储到encoded_aac_data字段中。</span><br><span class="line">    */</span><br><span class="line">    long max_input_count = ctx-&gt;max_input_byte_count;</span><br><span class="line">    long curr_read_count = 0;</span><br><span class="line">    </span><br><span class="line">    do&#123;</span><br><span class="line">        long remain_count = len - curr_read_count;</span><br><span class="line">        if (remain_count &lt;= 0) &#123;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        long read_count = 0;</span><br><span class="line">        if (remain_count &gt; max_input_count) &#123;</span><br><span class="line">            read_count = max_input_count;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            read_count = remain_count;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        long input_samples = read_count * 8 / ctx-&gt;config.sample_size;</span><br><span class="line">        int write_count = faacEncEncode(ctx-&gt;faac_handler, (int32_t * )(pcm_data + curr_read_count), (uint32_t)input_samples, (uint8_t *)ctx-&gt;aac_buffer, (uint32_t)ctx-&gt;max_output_byte_count);</span><br><span class="line">        </span><br><span class="line">        if (write_count &gt; 0) &#123;</span><br><span class="line">            data_writer.write_bytes(&amp;ctx-&gt;encoded_aac_data, (const uint8_t *)ctx-&gt;aac_buffer, write_count);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        curr_read_count += read_count;</span><br><span class="line">    &#125; while (curr_read_count + max_input_count &lt; len);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="faac封装第三步：关闭编码器："><a href="#faac封装第三步：关闭编码器：" class="headerlink" title="faac封装第三步：关闭编码器："></a>faac封装第三步：关闭编码器：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">extern void free_aw_faac_context(aw_faac_context **context_p)&#123;</span><br><span class="line">    ...</span><br><span class="line">    //关闭faac编码器</span><br><span class="line">    faacEncClose(context-&gt;faac_handler);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述代码仅仅作为faac编码器的封装，能够实现打开编码器。</p>
+<p>真正实现编码过程的文件是：aw_sw_faac_encoder.h/aw_sw_faac_encoder.c文件</p>
+<p>此文件的功能是：将传入的pcm数据通过aw_faac.c提供的功能，将数据转成aac数据格式，然后将aac数据格式转成flv格式，如何转成flv格式，会在后续文章介绍。</p>
+<p>来看一下 aw_sw_faac_encoder.c文件的实现。<br>此文件逻辑也很清晰，它实现的功能有：</p>
+<ol>
+<li>开启编码器，创建一些过程变量。</li>
+<li>将audio specific config data 转成flv帧数据。</li>
+<li>将接收到的pcm数据，转成aac数据，然后将aac数据转成flv音频数据。</li>
+<li>关闭编码器。</li>
+</ol>
+<p>可以看出，这种类似功能性代码，一般都是三部曲：打开－使用－关闭。</p>
+<p>下面来看代码。</p>
+<h2 id="音频软编码器第一步：开启编码器"><a href="#音频软编码器第一步：开启编码器" class="headerlink" title="音频软编码器第一步：开启编码器"></a>音频软编码器第一步：开启编码器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">    faac_config：需要由上层传入相关配置属性</span><br><span class="line">*/</span><br><span class="line">extern void aw_sw_encoder_open_faac_encoder(aw_faac_config *faac_config)&#123;</span><br><span class="line">    //是否已经开启了，避免重复开启</span><br><span class="line">    if (aw_sw_faac_encoder_is_valid()) &#123;</span><br><span class="line">        aw_log(&quot;[E] aw_sw_encoder_open_faac_encoder when encoder is already inited&quot;);</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //创建配置</span><br><span class="line">    int32_t faac_cfg_len = sizeof(aw_faac_config);</span><br><span class="line">    if (!s_faac_config) &#123;</span><br><span class="line">        s_faac_config = aw_alloc(faac_cfg_len);</span><br><span class="line">    &#125;</span><br><span class="line">    memcpy(s_faac_config, faac_config, faac_cfg_len);</span><br><span class="line">    </span><br><span class="line">    //开启faac软编码</span><br><span class="line">    s_faac_ctx = alloc_aw_faac_context(*faac_config);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="音频软编码第二步：将audio-specific-config-data-转成flv帧数据。"><a href="#音频软编码第二步：将audio-specific-config-data-转成flv帧数据。" class="headerlink" title="音频软编码第二步：将audio specific config data 转成flv帧数据。"></a>音频软编码第二步：将audio specific config data 转成flv帧数据。</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">extern aw_flv_audio_tag *aw_sw_encoder_create_faac_specific_config_tag()&#123;</span><br><span class="line">    //是否已打开编码器</span><br><span class="line">    if(!aw_sw_faac_encoder_is_valid())&#123;</span><br><span class="line">        aw_log(&quot;[E] aw_sw_encoder_create_faac_specific_config_tag when audio encoder is not inited&quot;);</span><br><span class="line">        return NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //创建 audio specfic config record</span><br><span class="line">    aw_flv_audio_tag *aac_tag = aw_sw_encoder_create_flv_audio_tag(&amp;s_faac_ctx-&gt;config);</span><br><span class="line">    //根据flv协议：audio specific data对应的 aac_packet_type 固定为 aw_flv_a_aac_package_type_aac_sequence_header 值为0</span><br><span class="line">    //普通的音频帧，此处值为1.</span><br><span class="line">    aac_tag-&gt;aac_packet_type = aw_flv_a_aac_package_type_aac_sequence_header;</span><br><span class="line">    </span><br><span class="line">    aac_tag-&gt;config_record_data = copy_aw_data(s_faac_ctx-&gt;audio_specific_config_data);</span><br><span class="line">    aac_tag-&gt;common_tag.timestamp = 0;</span><br><span class="line">    aac_tag-&gt;common_tag.data_size = s_faac_ctx-&gt;audio_specific_config_data-&gt;size + 11 + aac_tag-&gt;common_tag.header_size;</span><br><span class="line">    </span><br><span class="line">    return aac_tag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="音频软编码器第三步：将接收到的pcm数据转成aac数据，然后将aac数据转成flv音频数据"><a href="#音频软编码器第三步：将接收到的pcm数据转成aac数据，然后将aac数据转成flv音频数据" class="headerlink" title="音频软编码器第三步：将接收到的pcm数据转成aac数据，然后将aac数据转成flv音频数据"></a>音频软编码器第三步：将接收到的pcm数据转成aac数据，然后将aac数据转成flv音频数据</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">    pcm_data: 传入的pcm数据</span><br><span class="line">    len: pcm数据长度</span><br><span class="line">    timestamp：flv时间戳，rtmp协议要求发送的flv音视频帧的时间戳需为均匀增加，不允许 后发送的数据时间戳 比 先发送的数据的时间戳 还要小。</span><br><span class="line">    aw_flv_audio_tag: 返回类型，生成的flv音频数据（flv中，每帧数据称为一个tag）。</span><br><span class="line">*/</span><br><span class="line">extern aw_flv_audio_tag *aw_sw_encoder_encode_faac_data(int8_t *pcm_data, long len, uint32_t timestamp)&#123;</span><br><span class="line">    if (!aw_sw_faac_encoder_is_valid()) &#123;</span><br><span class="line">        aw_log(&quot;[E] aw_sw_encoder_encode_faac_data when encoder is not inited&quot;);</span><br><span class="line">        return NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //将pcm数据编码成aac数据</span><br><span class="line">    aw_encode_pcm_frame_2_aac(s_faac_ctx, pcm_data, len);</span><br><span class="line">    </span><br><span class="line">    // 使用faac编码的数据会带有7个字节的adts头。rtmp不接受此值，在此去掉前7个字节。</span><br><span class="line">    int adts_header_size = 7;</span><br><span class="line">    </span><br><span class="line">    //除去ADTS头的7字节</span><br><span class="line">    if (s_faac_ctx-&gt;encoded_aac_data-&gt;size &lt;= adts_header_size) &#123;</span><br><span class="line">        return NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //将aac数据封装成flv音频帧。flv帧仅仅是将aac数据增加一些固定信息。并没有对aac数据进行编码操作。</span><br><span class="line">    aw_flv_audio_tag *audio_tag = aw_encoder_create_audio_tag((int8_t *)s_faac_ctx-&gt;encoded_aac_data-&gt;data + adts_header_size, s_faac_ctx-&gt;encoded_aac_data-&gt;size - adts_header_size, timestamp, &amp;s_faac_ctx-&gt;config);</span><br><span class="line">    </span><br><span class="line">    audio_count++;</span><br><span class="line">    </span><br><span class="line">    //返回结果</span><br><span class="line">    return audio_tag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="音频软编码器第四步：关闭编码器"><a href="#音频软编码器第四步：关闭编码器" class="headerlink" title="音频软编码器第四步：关闭编码器"></a>音频软编码器第四步：关闭编码器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">extern void aw_sw_encoder_close_faac_encoder()&#123;</span><br><span class="line">    //避免重复关闭</span><br><span class="line">    if (!aw_sw_faac_encoder_is_valid()) &#123;</span><br><span class="line">        aw_log(&quot;[E] aw_sw_encoder_close_faac_encoder when encoder is not inited&quot;);</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //是否aw_faac_context，也就关闭了faac编码环境。</span><br><span class="line">    free_aw_faac_context(&amp;s_faac_ctx);</span><br><span class="line">    </span><br><span class="line">    //释放配置数据</span><br><span class="line">    if (s_faac_config) &#123;</span><br><span class="line">        aw_free(s_faac_config);</span><br><span class="line">        s_faac_config = NULL;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>到此为止，音频软编码器就介绍完了。已经成功实现了将pcm数据转成flv音频帧。</p>
+<p>下面介绍视频软编码。<br>套路同音频编码一致，对应的视频软编码是对x264这个库的封装。<br>文件在aw_x264.h/aw_x264.c中。</p>
+<p>它实现的功能如下：</p>
+<ol>
+<li>初始化x264参数，打开编码环境</li>
+<li>进行编码</li>
+<li>关闭编码环境。</li>
+</ol>
+<h2 id="x264封装第一步：初始化x264参数，打开编码环境"><a href="#x264封装第一步：初始化x264参数，打开编码环境" class="headerlink" title="x264封装第一步：初始化x264参数，打开编码环境"></a>x264封装第一步：初始化x264参数，打开编码环境</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">    config 表示配置数据</span><br><span class="line">    aw_x264_context 是自定义结构体，用于存储x264编码重要属性及过程变量。</span><br><span class="line">*/</span><br><span class="line">extern aw_x264_context *alloc_aw_x264_context(aw_x264_config config)&#123;</span><br><span class="line">    aw_x264_context *ctx = aw_alloc(sizeof(aw_x264_context));</span><br><span class="line">    memset(ctx, 0, sizeof(aw_x264_context));</span><br><span class="line">    </span><br><span class="line">    //数据数据默认为 I420</span><br><span class="line">    if (!config.input_data_format) &#123;</span><br><span class="line">        config.input_data_format = X264_CSP_I420;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //创建handler</span><br><span class="line">    memcpy(&amp;ctx-&gt;config, &amp;config, sizeof(aw_x264_config));</span><br><span class="line">    x264_param_t *x264_param = NULL;</span><br><span class="line">    //x264参数，具体请参考：http://blog.csdn.net/table/article/details/8085115</span><br><span class="line">    aw_create_x264_param(ctx, &amp;x264_param);</span><br><span class="line">    //开启编码器</span><br><span class="line">    aw_open_x264_handler(ctx, x264_param);</span><br><span class="line">    aw_free(x264_param);</span><br><span class="line">    </span><br><span class="line">    //创建pic_in，x264内部用于存储输入图像数据的一段空间。</span><br><span class="line">    x264_picture_t *pic_in = aw_alloc(sizeof(x264_picture_t));</span><br><span class="line">    x264_picture_init(pic_in);</span><br><span class="line">    </span><br><span class="line">    //[注意有坑]</span><br><span class="line">    //aw_stride是一个宏，用于将视频宽度转成16的倍数。如果不是16的倍数，有时候会编码失败（颜色缺失等）。</span><br><span class="line">    int alloc_width = aw_stride(config.width);</span><br><span class="line">    </span><br><span class="line">    x264_picture_alloc(pic_in, config.input_data_format, alloc_width, config.height);</span><br><span class="line"></span><br><span class="line">    pic_in-&gt;img.i_csp = config.input_data_format;</span><br><span class="line">    </span><br><span class="line">    //i_stride 表示换行步长，跟plane数及格式有关，x264内部用来判定读取多少数据需要换行。</span><br><span class="line">    //关于yuv数据格式在第二章里面介绍过，这里再次回顾一下。</span><br><span class="line">    if (config.input_data_format == X264_CSP_NV12) &#123;</span><br><span class="line">        //nv12数据包含2个plane，第一个plane存储了y数据大小为 width * height，</span><br><span class="line">        //第二个plane存储uv数据，u和v隔位存储，数据大小为：width * (height / 2)</span><br><span class="line">        pic_in-&gt;img.i_stride[0] = alloc_width;</span><br><span class="line">        pic_in-&gt;img.i_stride[1] = alloc_width;</span><br><span class="line">        pic_in-&gt;img.i_plane = 2;</span><br><span class="line">    &#125;else if(config.input_data_format == X264_CSP_BGR || config.input_data_format == X264_CSP_RGB)&#123;</span><br><span class="line">        //rgb数据包含一个plane，数据长度为 width * 3 * height。</span><br><span class="line">        pic_in-&gt;img.i_stride[0] = alloc_width * 3;</span><br><span class="line">        pic_in-&gt;img.i_plane = 1;</span><br><span class="line">    &#125;else if(config.input_data_format == X264_CSP_BGRA)&#123;</span><br><span class="line">        //bgra同rgb类似</span><br><span class="line">        pic_in-&gt;img.i_stride[0] = alloc_width * 4;</span><br><span class="line">        pic_in-&gt;img.i_plane = 1;</span><br><span class="line">    &#125;else&#123;//YUV420</span><br><span class="line">        //yuv420即I420格式。</span><br><span class="line">        //包含3个plane，第一个plane存储y数据大小为width * height</span><br><span class="line">        //第二个存储u数据，数据大小为 width * height / 4</span><br><span class="line">        //第三个存储v数据，数据大小为 width * height / 4</span><br><span class="line">        pic_in-&gt;img.i_stride[0] = alloc_width;</span><br><span class="line">        pic_in-&gt;img.i_stride[1] = alloc_width / 2;</span><br><span class="line">        pic_in-&gt;img.i_stride[2] = alloc_width / 2;</span><br><span class="line">        pic_in-&gt;img.i_plane = 3;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //其他数据初始化，pic_in 用于存储输入数据(yuv/rgb等数据)，pic_out用于存储输出数据(h264数据)</span><br><span class="line">    ctx-&gt;pic_in = pic_in;</span><br><span class="line">    </span><br><span class="line">    ctx-&gt;pic_out = aw_alloc(sizeof(x264_picture_t));</span><br><span class="line">    x264_picture_init(ctx-&gt;pic_out);</span><br><span class="line">    </span><br><span class="line">    //编码后数据变量</span><br><span class="line">    ctx-&gt;encoded_h264_data = alloc_aw_data(0);</span><br><span class="line">    ctx-&gt;sps_pps_data = alloc_aw_data(0);</span><br><span class="line">    </span><br><span class="line">    //获取sps pps</span><br><span class="line">    // sps pps 数据是rtmp协议要求的必需在所有flv视频帧之前发送的一帧数据，存储了h264视频的一些关键属性。</span><br><span class="line">    // 具体获取方法请看demo，很简单，这里就不解释了。</span><br><span class="line">    aw_encode_x264_header(ctx);</span><br><span class="line">    </span><br><span class="line">    return ctx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="x264封装第二步：开始编码"><a href="#x264封装第二步：开始编码" class="headerlink" title="x264封装第二步：开始编码"></a>x264封装第二步：开始编码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">//编码一帧数据</span><br><span class="line">extern void aw_encode_yuv_frame_2_x264(aw_x264_context *aw_ctx, int8_t *yuv_frame, int len)&#123;</span><br><span class="line">    if (len &gt; 0 &amp;&amp; yuv_frame) &#123;</span><br><span class="line">        //将视频数据填充到pic_in中，pic_in上面已经介绍过，x264需要这样处理。</span><br><span class="line">        int actual_width = aw_stride(aw_ctx-&gt;config.width);</span><br><span class="line">        //数据保存到pic_in中</span><br><span class="line">        if (aw_ctx-&gt;config.input_data_format == X264_CSP_NV12) &#123;</span><br><span class="line">            aw_ctx-&gt;pic_in-&gt;img.plane[0] = (uint8_t *)yuv_frame;</span><br><span class="line">            aw_ctx-&gt;pic_in-&gt;img.plane[1] = (uint8_t *)yuv_frame + actual_width * aw_ctx-&gt;config.height;</span><br><span class="line">        &#125;else if(aw_ctx-&gt;config.input_data_format == X264_CSP_BGR || aw_ctx-&gt;config.input_data_format == X264_CSP_RGB)&#123;</span><br><span class="line">            aw_ctx-&gt;pic_in-&gt;img.plane[0] = (uint8_t *)yuv_frame;</span><br><span class="line">        &#125;else if(aw_ctx-&gt;config.input_data_format == X264_CSP_BGRA)&#123;</span><br><span class="line">            aw_ctx-&gt;pic_in-&gt;img.plane[0] = (uint8_t *)yuv_frame;</span><br><span class="line">        &#125;else&#123;//YUV420</span><br><span class="line">            aw_ctx-&gt;pic_in-&gt;img.plane[0] = (uint8_t *)yuv_frame;</span><br><span class="line">            aw_ctx-&gt;pic_in-&gt;img.plane[1] = (uint8_t *)yuv_frame + actual_width * aw_ctx-&gt;config.height;</span><br><span class="line">            aw_ctx-&gt;pic_in-&gt;img.plane[2] = (uint8_t *)yuv_frame + actual_width * aw_ctx-&gt;config.height * 5 / 4;</span><br><span class="line">        &#125;</span><br><span class="line">        //x264编码，编码后的数据存储在aw_ctx-&gt;nal中</span><br><span class="line">        x264_encoder_encode(aw_ctx-&gt;x264_handler, &amp;aw_ctx-&gt;nal, &amp;aw_ctx-&gt;nal_count, aw_ctx-&gt;pic_in, aw_ctx-&gt;pic_out);</span><br><span class="line">        aw_ctx-&gt;pic_in-&gt;i_pts++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //将编码后的数据转存到encoded_h264_data中，这里面存储的就是编码好的h264视频帧了。</span><br><span class="line">    reset_aw_data(&amp;aw_ctx-&gt;encoded_h264_data);</span><br><span class="line">    if (ctx-&gt;nal_count &gt; 0) &#123;</span><br><span class="line">        int i = 0;</span><br><span class="line">        for (; i &lt; ctx-&gt;nal_count; i++) &#123;</span><br><span class="line">            data_writer.write_bytes(&amp;ctx-&gt;encoded_h264_data, ctx-&gt;nal[i].p_payload, ctx-&gt;nal[i].i_payload);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="x264封装第三步：关闭编码环境。"><a href="#x264封装第三步：关闭编码环境。" class="headerlink" title="x264封装第三步：关闭编码环境。"></a>x264封装第三步：关闭编码环境。</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">    很简单，分别释放pic_in，pic_out，x264_handler即可</span><br><span class="line">*/</span><br><span class="line">extern void free_aw_x264_context(aw_x264_context **ctx_p)&#123;</span><br><span class="line">    aw_x264_context *ctx = *ctx_p;</span><br><span class="line">    if (ctx) &#123;</span><br><span class="line">        //释放pic_in</span><br><span class="line">        if (ctx-&gt;pic_in) &#123;</span><br><span class="line">            x264_picture_clean(ctx-&gt;pic_in);</span><br><span class="line">            aw_free(ctx-&gt;pic_in);</span><br><span class="line">            ctx-&gt;pic_in = NULL;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        //释放pic_out</span><br><span class="line">        if (ctx-&gt;pic_out) &#123;</span><br><span class="line">            aw_free(ctx-&gt;pic_out);</span><br><span class="line">            ctx-&gt;pic_out = NULL;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line">        </span><br><span class="line">        //关闭handler</span><br><span class="line">        if (ctx-&gt;x264_handler) &#123;</span><br><span class="line">            x264_encoder_close(ctx-&gt;x264_handler);</span><br><span class="line">            ctx-&gt;x264_handler = NULL;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码只是对x264编码流程进行简单封装。<br>真正实现完整转码逻辑的是在 aw_sw_x264_encoder.h/aw_sw_x264_encoder.c 中。</p>
+<p>它实现了如下功能：</p>
+<ol>
+<li>将收到的yuv数据编码成 h264格式。</li>
+<li>生成包含sps/pps数据的flv视频帧。</li>
+<li>将h264格式的数据转成flv视频数据。</li>
+<li>关闭编码器。</li>
+</ol>
+<h2 id="视频软编码器第一步：收到yuv数据，并编码成h264格式。"><a href="#视频软编码器第一步：收到yuv数据，并编码成h264格式。" class="headerlink" title="视频软编码器第一步：收到yuv数据，并编码成h264格式。"></a>视频软编码器第一步：收到yuv数据，并编码成h264格式。</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">//打开编码器，就是在aw_x264基础上，封了一层。</span><br><span class="line">extern void aw_sw_encoder_open_x264_encoder(aw_x264_config *x264_config)&#123;</span><br><span class="line">    if (aw_sw_x264_encoder_is_valid()) &#123;</span><br><span class="line">        aw_log(&quot;[E] aw_sw_encoder_open_video_encoder when video encoder is not inited&quot;);</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    int32_t x264_cfg_len = sizeof(aw_x264_config);</span><br><span class="line">    if (!s_x264_config) &#123;</span><br><span class="line">        s_x264_config = aw_alloc(x264_cfg_len);</span><br><span class="line">    &#125;</span><br><span class="line">    memcpy(s_x264_config, x264_config, x264_cfg_len);</span><br><span class="line">    </span><br><span class="line">    s_x264_ctx = alloc_aw_x264_context(*x264_config);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="视频软编码器第二步：生成包含sps-pps数据的flv视频帧"><a href="#视频软编码器第二步：生成包含sps-pps数据的flv视频帧" class="headerlink" title="视频软编码器第二步：生成包含sps/pps数据的flv视频帧"></a>视频软编码器第二步：生成包含sps/pps数据的flv视频帧</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">//根据flv/h264/aac协议创建video/audio首帧tag，flv 格式相关代码在 aw_encode_flv.h/aw_encode_flv.c 中</span><br><span class="line">extern aw_flv_video_tag *aw_sw_encoder_create_x264_sps_pps_tag()&#123;</span><br><span class="line">    if(!aw_sw_x264_encoder_is_valid())&#123;</span><br><span class="line">        aw_log(&quot;[E] aw_sw_encoder_create_video_sps_pps_tag when video encoder is not inited&quot;);</span><br><span class="line">        return NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //创建 sps pps</span><br><span class="line">    // 创建flv视频tag</span><br><span class="line">    aw_flv_video_tag *sps_pps_tag = aw_sw_encoder_create_flv_video_tag();</span><br><span class="line">    // 关键帧</span><br><span class="line">    sps_pps_tag-&gt;frame_type = aw_flv_v_frame_type_key;</span><br><span class="line">    // package type 为header，固定</span><br><span class="line">    sps_pps_tag-&gt;h264_package_type = aw_flv_v_h264_packet_type_seq_header;</span><br><span class="line">    // cts，项目内所有视频帧的cts 都为0</span><br><span class="line">    sps_pps_tag-&gt;h264_composition_time = 0;</span><br><span class="line">    // 将aw_x264中生成的sps/pps数据copy到tag中</span><br><span class="line">    sps_pps_tag-&gt;config_record_data = copy_aw_data(s_x264_ctx-&gt;sps_pps_data);</span><br><span class="line">    // 时间戳为0</span><br><span class="line">    sps_pps_tag-&gt;common_tag.timestamp = 0;</span><br><span class="line">    // flv tag长度为：header size + data header(11字节) + 数据长度（后续介绍）</span><br><span class="line">    sps_pps_tag-&gt;common_tag.data_size = s_x264_ctx-&gt;sps_pps_data-&gt;size + 11 + sps_pps_tag-&gt;common_tag.header_size;</span><br><span class="line">    return sps_pps_tag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="视频软编码器第三步：将h264格式的数据转成flv视频数据。"><a href="#视频软编码器第三步：将h264格式的数据转成flv视频数据。" class="headerlink" title="视频软编码器第三步：将h264格式的数据转成flv视频数据。"></a>视频软编码器第三步：将h264格式的数据转成flv视频数据。</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">//将采集到的video yuv数据，编码为flv video tag</span><br><span class="line">extern aw_flv_video_tag * aw_sw_encoder_encode_x264_data(int8_t *yuv_data, long len, uint32_t timeStamp)&#123;</span><br><span class="line">    //是否已开启编码</span><br><span class="line">    if (!aw_sw_x264_encoder_is_valid()) &#123;</span><br><span class="line">        aw_log(&quot;[E] aw_sw_encoder_encode_video_data when video encoder is not inited&quot;);</span><br><span class="line">        return NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //执行编码</span><br><span class="line">    aw_encode_yuv_frame_2_x264(s_x264_ctx, yuv_data, (int32_t)len);</span><br><span class="line">    </span><br><span class="line">    //编码后是否能取到数据</span><br><span class="line">    if (s_x264_ctx-&gt;encoded_h264_data-&gt;size &lt;= 0) &#123;</span><br><span class="line">        return NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //将h264数据转成flv tag</span><br><span class="line">    x264_picture_t *pic_out = s_x264_ctx-&gt;pic_out;</span><br><span class="line">    </span><br><span class="line">    aw_flv_video_tag *video_tag = aw_encoder_create_video_tag((int8_t *)s_x264_ctx-&gt;encoded_h264_data-&gt;data, s_x264_ctx-&gt;encoded_h264_data-&gt;size, timeStamp, (uint32_t)((pic_out-&gt;i_pts - pic_out-&gt;i_dts) * 1000.0 / s_x264_ctx-&gt;config.fps), pic_out-&gt;b_keyframe);</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">    return video_tag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="视频软编码器第四步：关闭编码器"><a href="#视频软编码器第四步：关闭编码器" class="headerlink" title="视频软编码器第四步：关闭编码器"></a>视频软编码器第四步：关闭编码器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//关闭编码器</span><br><span class="line">extern void aw_sw_encoder_close_x264_encoder()&#123;</span><br><span class="line">    //避免重复关闭</span><br><span class="line">    if (!aw_sw_x264_encoder_is_valid()) &#123;</span><br><span class="line">        aw_log(&quot;[E] aw_sw_encoder_close_video_encoder s_faac_ctx is NULL&quot;);</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //释放配置</span><br><span class="line">    if (s_x264_config) &#123;</span><br><span class="line">        aw_free(s_x264_config);</span><br><span class="line">        s_x264_config = NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //释放context</span><br><span class="line">    free_aw_x264_context(&amp;s_x264_ctx);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此，软编码代码介绍完毕。<br>可以通过 AWSWFaacEncoder/AWSWX264Encoder 类调用上面的软编码器，给上层提供一致的接口。</p>
+<p>总结，软编码器涉及的内容：</p>
+<ol>
+<li>第三方编码器：libfaac/libx264</li>
+<li>第三方编码器封装：aw_faac.h/aw_faac.c，aw_x264.h/aw_x264.c</li>
+<li>编码器(将原始数据转成最终数据)封装：aw_sw_faac_encoder.h/aw_sw_faac_encoder.c，aw_sw_x264_encoder.h/aw_sw_x264_encoder.c</li>
+<li>顶层抽象：AWSWFaacEncoder/AWSWX264Encoder</li>
+</ol>
+<p>编码过程中需要注意的地方：</p>
+<ol>
+<li>注意 audio specific config 及 sps/pps数据的获取，不获取这两种数据，服务器没办法识别音视频帧的。</li>
+<li>faac编码后注意去除adts头部。</li>
+<li>x264编码器如果输入分辨率的宽度不是16的倍数，需要将其扩展成16的倍数，否则编码可能会出问题(颜色丢失，uv混乱)。</li>
+</ol>
+<h2 id="文章列表"><a href="#文章列表" class="headerlink" title="文章列表"></a>文章列表</h2><ol>
+<li><a href="/2016/11/07/1小时学会：最简单的iOS直播推流（一）介绍/">1小时学会：最简单的iOS直播推流（一）项目介绍</a></li>
+<li><a href="/2016/11/10/1小时学会：最简单的iOS直播推流（二）代码架构概述/">1小时学会：最简单的iOS直播推流（二）代码架构概述</a></li>
+<li><a href="/2016/11/14/1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频数据/">1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜/">1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取/">1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取</a></li>
+<li><a href="/2016/11/24/1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍/">1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍</a></li>
+<li><a href="/2016/12/07/1小时学会：最简单的iOS直播推流（七）h264-aac-硬编码/">1小时学会：最简单的iOS直播推流（七）h264/aac 硬编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（八）h264-aac-软编码/">1小时学会：最简单的iOS直播推流（八）h264/aac 软编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（九）flv-编码与音视频时间戳同步/">1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十）librtmp使用介绍/">1小时学会：最简单的iOS直播推流（十）librtmp使用介绍</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十一）sps-amp-pps和AudioSpecificConfig介绍（完结）/">1小时学会：最简单的iOS直播推流（十一）sps&amp;pps和AudioSpecificConfig介绍（完结）</a></li>
+<li><a href="/2017/01/25/1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里/">1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里</a></li>
+</ol>
+
+    </div>
+
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">hardman</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2017/11/23/1小时学会：最简单的iOS直播推流（九）flv-编码与音视频时间戳同步/" class="pre-post btn btn-default" title='1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步 '>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步 </span>
+        </a>
+    
+    
+        <a href="/2017/01/25/1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里/" class="next-post btn btn-default" title='1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里 '>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里 </span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+    
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'kL6uvsjGUgAWOmaJfW8iYNYz-gzGzoHsz',
+            appKey: 'X0NBsfhG3fTX42b6xpCLsvsP',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: false,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: 'zh-CN'.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#音频软编码"><span class="toc-text">音频软编码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#faac封装第一步：开启编码环境"><span class="toc-text">faac封装第一步：开启编码环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#faac封装第二步：开始编码"><span class="toc-text">faac封装第二步：开始编码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#faac封装第三步：关闭编码器："><span class="toc-text">faac封装第三步：关闭编码器：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#音频软编码器第一步：开启编码器"><span class="toc-text">音频软编码器第一步：开启编码器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#音频软编码第二步：将audio-specific-config-data-转成flv帧数据。"><span class="toc-text">音频软编码第二步：将audio specific config data 转成flv帧数据。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#音频软编码器第三步：将接收到的pcm数据转成aac数据，然后将aac数据转成flv音频数据"><span class="toc-text">音频软编码器第三步：将接收到的pcm数据转成aac数据，然后将aac数据转成flv音频数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#音频软编码器第四步：关闭编码器"><span class="toc-text">音频软编码器第四步：关闭编码器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#x264封装第一步：初始化x264参数，打开编码环境"><span class="toc-text">x264封装第一步：初始化x264参数，打开编码环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#x264封装第二步：开始编码"><span class="toc-text">x264封装第二步：开始编码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#x264封装第三步：关闭编码环境。"><span class="toc-text">x264封装第三步：关闭编码环境。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#视频软编码器第一步：收到yuv数据，并编码成h264格式。"><span class="toc-text">视频软编码器第一步：收到yuv数据，并编码成h264格式。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#视频软编码器第二步：生成包含sps-pps数据的flv视频帧"><span class="toc-text">视频软编码器第二步：生成包含sps/pps数据的flv视频帧</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#视频软编码器第三步：将h264格式的数据转成flv视频数据。"><span class="toc-text">视频软编码器第三步：将h264格式的数据转成flv视频数据。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#视频软编码器第四步：关闭编码器"><span class="toc-text">视频软编码器第四步：关闭编码器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文章列表"><span class="toc-text">文章列表</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"> 
+                <span>Copyright &copy; 2018
+                </span> | 
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> | 
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+
+</body>
+</html>

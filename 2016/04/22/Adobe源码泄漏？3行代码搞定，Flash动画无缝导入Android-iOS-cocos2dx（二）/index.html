@@ -1,0 +1,396 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="hardman的blog">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="https://hardman.github.io">
+    <!--SEO-->
+
+<meta name="description" content="iOS，web，游戏技术探索"/>
+
+
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+
+<title>Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（二） | hardman的blog</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="hardman的blog" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1274215625 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1274215625%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpeg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='hardman'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> iOS开发，对web和游戏开发也有些许兴趣~ </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://hardman.github.io">hardman的blog</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                                <div id="menu-line-0"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS/"><i class="fa "></i>iOS</a>
+                                <div id="menu-line-1"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS推流/"><i class="fa "></i>iOS推流</a>
+                                <div id="menu-line-2"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/cocos/"><i class="fa "></i>cocos</a>
+                                <div id="menu-line-3"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>归档</a>
+                                <div id="menu-line-4"></div>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（二）">
+            
+	            Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（二）
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/iOS">
+            iOS
+        </a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/iOS" title='iOS'>
+                        iOS
+                    </a>
+                
+                    <a href="/tags/动画" title='动画'>
+                        动画
+                    </a>
+                
+                    <a href="/tags/flash" title='flash'>
+                        flash
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2016/04/22</span>
+        </span>
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <p><strong>[注] iOS代码已重构，效率提升90%，200层动画不卡。[2016.10.27]</strong></p>
+<p>上一篇 <a href="http://blog.csdn.net/hard_man/article/details/51222423" target="_blank" rel="noopener">点此阅读</a> 简要介绍了FlashToAnimation的功能，也就是将flash动画无缝导入到Android/iOS及cocos2dx中运行, 这一篇介绍这个库的使用方法。<a href="https://github.com/hardman/FlashAnimationToMobile" target="_blank" rel="noopener">点此查看源码。</a></p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>首先确保系统中安装了flash，并且flash版本应该在cs3或者以上。<br>然后把”源码根目录/tools/flashScript”目录内的所有文件和文件夹copy到如下目录：</p>
+<ul>
+<li>Mac：~/Library/Application Support/Adobe/[Flash CS+版本号]/[en_US或者zh_CN]/Configuration/Commands</li>
+<li>Windows：C:\Users[用户名]\AppData\Local\Adobe[Flash CS+版本号][en_US或者zh_CN]\Configuration\Commands</li>
+</ul>
+<p>在文件管理器（或Finder）目录中看起来是这样的：</p>
+<pre><code>--Commands
+    -- 1.根据png创建元件.jsfl
+    -- 2.修改fla中元素的名字.jsfl
+    -- 3.导出动画数据.jsfl
+    -- libs/
+        --json2.jsfl
+    -- ....其他文件
+</code></pre><p>如图：<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/1.png?raw=true" width="600"></p>
+<p>这时候打开flash，点击菜单栏中的 Commands（中文的话应该是命令），在下拉菜单中就能看到我们加入的脚本啦。<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/2.png?raw=true" width="600"></p>
+<p>到此为止准备工作就绪。</p>
+<h2 id="美术人员制作flash动画的步骤"><a href="#美术人员制作flash动画的步骤" class="headerlink" title="美术人员制作flash动画的步骤"></a>美术人员制作flash动画的步骤</h2><p>下面步骤看起来很长，其实内容很简单，都是大家各自平时使用的经验，在这里写这么多是为了让小白用户不出错而已。<br>美术人员使用步骤：</p>
+<ul>
+<li><p>新建一个as3.0的Flash Document。<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/3.png?raw=true" width="600"></p>
+</li>
+<li><p>保存文档，请务必保存文档，否则脚本不生效，并按照如下规则命名：<br>fla的命名应该以 “.” 分为3部分：<br>   测试.test.fla<br>第一部分：中文，对本文件的中文描述。（不重要，可以随意取。）<br>第二部分：英文，表示本文件的英文标识符。（重要，在代码中会使用到这个关键字。）<br>第三部分：后缀，默认即可不用管。（使用.fla即可。）<br>其中第一部分中文可忽略。<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/4.png?raw=true" width="600"></p>
+</li>
+<li><p>在新建的Flash文件窗口右侧的Library栏中，点击右键，新建一个文件夹名为“pics”(<strong>注意，名字不能错，后面有类似的要求也要遵守</strong>)。</p>
+</li>
+<li><p>把制作flash的图片（png格式）拖入pics文件夹中。[<strong>!!!注意，所有的png图片必须带后缀.png否则会出错！</strong>]<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/5.png?raw=true" width="600"></p>
+</li>
+<li><p>点击commands中的脚本“1.根据png创建元件”。结果如图：<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/6.png?raw=true" width="600"></p>
+</li>
+<li><p>如果是cocos2dx中使用，为了避免Sprite Frame Cache重名，或者想要为图片生成跟本动画相关的独一无二的前缀，可以点击commands中的脚本“2.修改fla中元素的名字”。结果如下：<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/7.png?raw=true" width="600"></p>
+</li>
+<li><p>iOS可能也有此问题。因为直接拖入xcode中的文件一般选择“create groups”，这个只是逻辑文件夹，如果其他文件夹内存在同名文件则会冲突。所以最好每次制作动画，添加png图片的时候，都执行一次脚本“2.修改fla中元素的名字“。</p>
+</li>
+<li><p>新建一个Movie clip（影片剪辑），取一个合适的名字。然后拖入anims文件夹中<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/8.png?raw=true" width="600"><br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/9.png?raw=true" width="600"></p>
+</li>
+<li><p>双击该Movie clip，进入编辑模式，此时就可以使用eles文件夹中的Movie clip，制作动画了。制作动画的具体细节要求，见下面的要求。<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/10.png?raw=true" width="600"></p>
+</li>
+<li><p>制作完成后，保存，美术人员的工作就完成了。<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/11.png?raw=true" width="600"></p>
+</li>
+</ul>
+<h2 id="美术人员制作flash动画完整要求"><a href="#美术人员制作flash动画完整要求" class="headerlink" title="美术人员制作flash动画完整要求"></a>美术人员制作flash动画完整要求</h2><ol>
+<li>下面涉及名字的地方可以使用 英文字母，数字和下划线，不要用中文。</li>
+<li>先制作动画所需要的图片，png/jpg格式的，所有的动画元素需要全部使用图片，不可以使用矢量图和文字等等。</li>
+<li>图片命名尽量简单，以减少程序处理的数据量。</li>
+<li>建立fla时，使用Action Script 3。</li>
+<li>在库中建立3个文件夹，名字为：pics（图片），anims（动画的动作，比如idle, move等），eles（图片对应的元件）。对应的资源请在不同的文件夹中建立。</li>
+<li>每张图片（pics）都需要生成一个元件（eles），不要把多张图片放在一个元件中。所以元件的数量应该同图片的数量是相同的。</li>
+<li>所有的元件请使用 “影片剪辑”(movie clip), 不要使用 “按钮” 和 “图片”。</li>
+<li>把制作好的png图片（只用png，不要用jpg或其它格式图片）导入到flash中，并拖进pics文件夹下面。</li>
+<li>依次生成png图片对应的元件（影片剪辑），把图片拖到元件中。使图片居中。元件名字应该同图片的名字完全相同。这一步可以使用脚本（“1.根据png创建元件“）代替这个操作。</li>
+<li>建立新的元件，还是使用”影片剪辑”(movie clip)，然后拖进anims文件夹中。这就是需要制作的动作了。</li>
+<li>这时候，就可以使用eles(不要使用pics中的图片)中的元件在时间轴中制作动作了。</li>
+<li>制作动作，帧的普通操作(关键帧关键帧之间的传统补间，只能使用传统补间)都可以使用，但是对关键帧的处理只支持以下几种：移动，缩放，旋转，倾斜，颜色叠加，透明度的变化 这5种变换。</li>
+<li>不要使用除13条中描述的其他任何对关键帧的操作，比如滤镜，显示混合等。</li>
+<li>不要使用缓动，不要使用补间动画时元件旋转等高端操作。如果某一帧某个元件不可见，可以通过设置它的透明度为0，或者插入空白关键帧来实现。</li>
+<li>不要使用嵌套动画：就是说关键帧上最好只用eles中的元素来做，不要做好了一段动画，把这段动画作为关键帧使用。。</li>
+<li><font color="red">使用eles中的原件制作动画时，始终保持锚点的位置在原件的中央，否则会出现位置不对的问题。默认锚点是在中央的，不要手动去调整它。</font></li>
+<li>最后，保存成fla就可以了。美术人员最终输出就是一个.fla文件。</li>
+</ol>
+<h2 id="程序人员使用美术制作好的动画"><a href="#程序人员使用美术制作好的动画" class="headerlink" title="程序人员使用美术制作好的动画"></a>程序人员使用美术制作好的动画</h2><p>程序拿到美术人员制作好的fla文件后，首先要进行一番检查，看看是否合格。<br>所以需要确保程序员熟悉flash的页面和菜单，并了解一些简单的flash软件操作。</p>
+<ul>
+<li>打开.fla文件。简单检查一下文件完成度。<ul>
+<li>是否3个文件夹都在(anims，pics，eles)。</li>
+<li>是否动画文件都在anims文件夹内。</li>
+<li>是否pics与eles内文件数量相同，并且一一对应，相对应的2个组件名字也要完全一致。</li>
+<li>是否pics和eles内的组件名字都有.png后缀。</li>
+</ul>
+</li>
+<li><p>如果需要给关键帧添加事件，需要选中该关键帧（首先在timeline中选中关键帧，然后在主页面中选中该帧代表的图片，过程中最好隐藏timeline中的其它层），然后点击右侧与library同级的标签页properties。在第一行标有 &lt; Instance Name &gt; 的输入框，输入你的事件名，程序能够在播放到这一帧的时候，触发这个事件<font color="red">（在代码中，事件对应的字段为”mark”）</font>。<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/12.png?raw=true" width="600"></p>
+</li>
+<li><p>事件添加完成后，选择菜单：Commands（命令）- “3.导出动画数据”。窗口底部同Timeline（时间轴）同级的Output（输出）栏中会显示脚本执行过程。<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/13.png?raw=true" width="600"></p>
+</li>
+<li><p>成功后，打开.fla文件所在的目录，即可看到”.flajson文件”和.fla同名”图片文件夹”（里面是图片）。<br><img src="https://github.com/hardman/OutLinkImages/blob/master/FlashAnimationToMobile/images/14.png?raw=true" width="600"></p>
+</li>
+<li><p>如果需要使用二进制动画描述文件，则需要把”.flajson文件”转为”.flabin文件”，这两个后缀也不能改。<br>转换需要使用脚本”源码根目录/tools/JsonToBin.py”文件。这是一个python脚本。如果系统内没有python，则需要安装一个。<br>然后打开命令行（mac中使用终端，Windows中可使用cmd）执行如下命令，执行后的.flabin就是转换成二进制后的文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python 源码根目录/tools/JsonToBin.py [.flajson文件全路径] [.flabin文件全路径]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>这时候可以把”.flajson文件”（或者 “.flabin文件”，二者使用其一即可，代码库内部处理，无需额外写代码判断）和”图片文件夹”放入程序指定目录就可以使用了。</p>
+<ul>
+<li>cocos2dx可以放在资源目录中任意位置。代码初始化时需要指定目录。</li>
+<li>Android需要将这2个文件放入 Assets文件夹的子文件夹flashAnims中。</li>
+<li>iOS拖入xcode中，选择“copy if need”和“create groups”，点击确定。</li>
+</ul>
+</li>
+</ul>
+<h2 id="程序员如何在代码中调用动画"><a href="#程序员如何在代码中调用动画" class="headerlink" title="程序员如何在代码中调用动画"></a>程序员如何在代码中调用动画</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">//cocos2dx版本使用方法</span><br><span class="line">//包含头文件</span><br><span class="line">#include &quot;AnimNode.h&quot;</span><br><span class="line">using namespace windy;</span><br><span class="line"></span><br><span class="line">... ...</span><br><span class="line"></span><br><span class="line">//使用代码</span><br><span class="line">AnimNode *animNode = AnimNode::create();</span><br><span class="line">animNode-&gt;load(&quot;xxxx/flashFileName.flajson&quot;);</span><br><span class="line">animNode-&gt;play(&quot;animationName&quot;, WINDY_ANIMNODE_LOOP_FOREVER);//这里的animationName就是flash中anims文件夹内的动画名称</span><br><span class="line">superNode-&gt;addChild(animNode);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--Android版本使用方法--&gt;</span><br><span class="line">&lt;!--Android还需要在manifest文件中添加权限，与demo中相同添加即可。不要忘记res/values目录中的flashview_attr.xml文件。 --&gt;</span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;RelativeLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    xmlns:tools=&quot;http://schemas.android.com/tools&quot;</span><br><span class="line">    xmlns:FlashView=&quot;http://schemas.android.com/apk/res-auto&quot; &lt;!--!!!!!!注意这个要加--&gt;</span><br><span class="line">    android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot;</span><br><span class="line">    tools:context=&quot;com.xcyo.yoyo.flashsupport.MainActivity&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;com.flashanimation.view.FlashView</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;match_parent&quot;</span><br><span class="line">        FlashView:flashDir=&quot;flashAnims&quot;</span><br><span class="line">        FlashView:flashFileName=&quot;callTextAnim&quot;</span><br><span class="line">        FlashView:defaultAnim=&quot;arriving1&quot; &lt;!--这里的defaultAnim就是flash中anims文件夹内的动画名称--&gt;</span><br><span class="line">        FlashView:designDPI=&quot;326&quot;</span><br><span class="line">        FlashView:loopTimes=&quot;0&quot;</span><br><span class="line">        android:id=&quot;@+id/flashview&quot;</span><br><span class="line">        /&gt;</span><br><span class="line"></span><br><span class="line">&lt;/RelativeLayout&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//iOS版本使用方法</span><br><span class="line">#import &quot;FlashView.h&quot;</span><br><span class="line"></span><br><span class="line">... ...</span><br><span class="line"></span><br><span class="line">FlashView *flashView = [[FlashView alloc] initWithFlashName:@&quot;flashFileName&quot;];</span><br><span class="line">flashView.frame = self.view.frame;// CGRectMake(100, 100, 200, 500);</span><br><span class="line">flashView.backgroundColor = [UIColor clearColor];</span><br><span class="line">[superView addSubview:flashView];</span><br><span class="line">[flashView play:@&quot;animationName&quot; loopTimes:FOREVER];//这里的animationName就是flash中anims文件夹内的动画名称</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">hardman</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2016/11/07/1小时学会：最简单的iOS直播推流（一）介绍/" class="pre-post btn btn-default" title='1小时学会：最简单的iOS直播推流（一）介绍'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（一）介绍</span>
+        </a>
+    
+    
+        <a href="/2016/04/22/Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android-iOS-cocos2dx（一）/" class="next-post btn btn-default" title='Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（一）'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（一）</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+    
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'kL6uvsjGUgAWOmaJfW8iYNYz-gzGzoHsz',
+            appKey: 'X0NBsfhG3fTX42b6xpCLsvsP',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: false,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: 'zh-CN'.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#准备工作"><span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#美术人员制作flash动画的步骤"><span class="toc-text">美术人员制作flash动画的步骤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#美术人员制作flash动画完整要求"><span class="toc-text">美术人员制作flash动画完整要求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#程序人员使用美术制作好的动画"><span class="toc-text">程序人员使用美术制作好的动画</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#程序员如何在代码中调用动画"><span class="toc-text">程序员如何在代码中调用动画</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"> 
+                <span>Copyright &copy; 2018
+                </span> | 
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> | 
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+
+</body>
+</html>

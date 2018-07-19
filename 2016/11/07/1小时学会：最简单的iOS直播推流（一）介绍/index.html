@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="hardman的blog">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="https://hardman.github.io">
+    <!--SEO-->
+
+<meta name="description" content="iOS，web，游戏技术探索"/>
+
+
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+
+<title>1小时学会：最简单的iOS直播推流（一）介绍 | hardman的blog</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="hardman的blog" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1274215625 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1274215625%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpeg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='hardman'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> iOS开发，对web和游戏开发也有些许兴趣~ </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://hardman.github.io">hardman的blog</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                                <div id="menu-line-0"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS/"><i class="fa "></i>iOS</a>
+                                <div id="menu-line-1"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS推流/"><i class="fa "></i>iOS推流</a>
+                                <div id="menu-line-2"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/cocos/"><i class="fa "></i>cocos</a>
+                                <div id="menu-line-3"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>归档</a>
+                                <div id="menu-line-4"></div>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="1小时学会：最简单的iOS直播推流（一）介绍">
+            
+	            1小时学会：最简单的iOS直播推流（一）介绍
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/iOS推流">
+            iOS推流
+        </a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/iOS" title='iOS'>
+                        iOS
+                    </a>
+                
+                    <a href="/tags/iOS推流" title='iOS推流'>
+                        iOS推流
+                    </a>
+                
+                    <a href="/tags/源码" title='源码'>
+                        源码
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2016/11/07</span>
+        </span>
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>最简单的iOS 推流代码，视频捕获，软编码(faac，x264)，硬编码（aac，h264），美颜，flv编码，rtmp协议，陆续更新代码解析，你想学的知识这里都有，愿意懂直播技术的同学快来看！！</p>
+</blockquote>
+<blockquote>
+<p>源代码：<a href="https://github.com/hardman/AWLive" target="_blank" rel="noopener">https://github.com/hardman/AWLive</a></p>
+</blockquote>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>最近在做iOS直播，研究了相关直播技术，主要包含两方面：推流，播放。</p>
+<p>因为之前使用cocos2dx做过一个视频游戏（<a href="https://itunes.apple.com/cn/app/lian-ai-gong-yu-shi-pin-yang/id1149280715?mt=8" target="_blank" rel="noopener">恋爱公寓</a>），用ffmpeg+sdl+cocos2dx实现过视频播放器。</p>
+<p>游戏中的视频是hevc(h265)+aac合成mp4文件，使用aes加密。视频播放的时候，需要使用ffmpeg中的crypt模块进行aes解密后播放视频，解析出来的yuv图片数据直接送给OpenGL显示。</p>
+<p>所以这次主要研究推流技术。并将<a href="https://github.com/hardman/AWLive" target="_blank" rel="noopener">代码开源</a>。</p>
+<p>其实直播技术中不论播放还是推流，更多的应该算是技术整合，就是将前人做好的协议和实现，整合成我们自己想要的功能。</p>
+<p>而这次做这个项目也并不是做了什么技术创新，github里面已经有着很多直播源代码，可能比我写的更好更完整。而我的代码，特点就是简单直接，直奔主题。</p>
+<p>我会在<a href="http://blog.csdn.net/hard_man" target="_blank" rel="noopener">我的博客</a>里做一些简单的解析，目的是希望让更多的人了解直播技术，能够了解直播内部的一些简单的原理，不再知其然不知其所以然。</p>
+<h2 id="功能范围"><a href="#功能范围" class="headerlink" title="功能范围"></a>功能范围</h2><ul>
+<li>视频捕获：系统方法捕获，GPUImage捕获，CMSampleRef解析</li>
+<li>美颜滤镜：GPUImage，</li>
+<li>视频变换：libyuv</li>
+<li>软编码：faac，x264</li>
+<li>硬编码：VideoToolbox(aac/h264)</li>
+<li>libaw：C语言函数库</li>
+<li>flv协议及编码</li>
+<li>推流协议：librtmp，rtmp重连，rtmp各种状态回调</li>
+</ul>
+<h2 id="代码使用及注意"><a href="#代码使用及注意" class="headerlink" title="代码使用及注意"></a>代码使用及注意</h2><p>代码使用方法见Demo。后续会根据上述功能的每一点对源代码进行解析。</p>
+<p>如果有什么疑问或者问题，请评论指出。希望能够给愿意了解直播技术的人抛出一块好砖。</p>
+<p>注1：项目中所有相关的文件名，类名，全局变量，全局方法都会加AW/aw作为前缀。</p>
+<p>注2：项目中关键代码都使用c语言编写，理论上可以很容易地移植到android中。</p>
+<h2 id="文章列表"><a href="#文章列表" class="headerlink" title="文章列表"></a>文章列表</h2><ol>
+<li><a href="/2016/11/07/1小时学会：最简单的iOS直播推流（一）介绍/">1小时学会：最简单的iOS直播推流（一）项目介绍</a></li>
+<li><a href="/2016/11/10/1小时学会：最简单的iOS直播推流（二）代码架构概述/">1小时学会：最简单的iOS直播推流（二）代码架构概述</a></li>
+<li><a href="/2016/11/14/1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频数据/">1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜/">1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取/">1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取</a></li>
+<li><a href="/2016/11/24/1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍/">1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍</a></li>
+<li><a href="/2016/12/07/1小时学会：最简单的iOS直播推流（七）h264-aac-硬编码/">1小时学会：最简单的iOS直播推流（七）h264/aac 硬编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（八）h264-aac-软编码/">1小时学会：最简单的iOS直播推流（八）h264/aac 软编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（九）flv-编码与音视频时间戳同步/">1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十）librtmp使用介绍/">1小时学会：最简单的iOS直播推流（十）librtmp使用介绍</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十一）sps-amp-pps和AudioSpecificConfig介绍（完结）/">1小时学会：最简单的iOS直播推流（十一）sps&amp;pps和AudioSpecificConfig介绍（完结）</a></li>
+<li><a href="/2017/01/25/1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里/">1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里</a></li>
+</ol>
+
+    </div>
+
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">hardman</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2016/11/10/1小时学会：最简单的iOS直播推流（二）代码架构概述/" class="pre-post btn btn-default" title='1小时学会：最简单的iOS直播推流（二）代码架构概述'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（二）代码架构概述</span>
+        </a>
+    
+    
+        <a href="/2016/04/22/Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android-iOS-cocos2dx（二）/" class="next-post btn btn-default" title='Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（二）'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">Adobe源码泄漏？3行代码搞定，Flash动画无缝导入Android/iOS/cocos2dx（二）</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+    
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'kL6uvsjGUgAWOmaJfW8iYNYz-gzGzoHsz',
+            appKey: 'X0NBsfhG3fTX42b6xpCLsvsP',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: false,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: 'zh-CN'.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#介绍"><span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#功能范围"><span class="toc-text">功能范围</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码使用及注意"><span class="toc-text">代码使用及注意</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文章列表"><span class="toc-text">文章列表</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"> 
+                <span>Copyright &copy; 2018
+                </span> | 
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> | 
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+
+</body>
+</html>

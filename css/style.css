@@ -269,7 +269,7 @@ pre {
 }
 .main-header .main-header-box .branding h2 {
   font-family: "STXingkai", "KaiTi", "Microsoft YaHei", "SimSun", sans-serif;
-  width: 320px;
+  /*width: 320px;*/
   margin: 0 auto;
   letter-spacing: 3px;
   color: #e67e22;
@@ -370,6 +370,12 @@ pre {
 .main-navigation .menu li.nav-current {
   border-bottom: 2px solid #e67e22;
   margin-bottom: -2px;
+}
+.main-navigation .menu li .menu-line {
+  background-color: #e67e22;
+  height:3px;
+  margin-bottom: 5px;
+  margin: 0 20px;
 }
 .main-navigation .navbar-header {
   text-align: center;
@@ -1414,6 +1420,8 @@ pre .javascript .function {
   }
   .main-navigation .menu li a {
     padding: 0;
+    font: 20px;
+    font-weight: 300;
   }
   .main-navigation .menu li ul {
     visibility: visible;
@@ -1424,6 +1432,12 @@ pre .javascript .function {
     width: 100%;
     opacity: 1;
     filter: alpha(opacity=100);
+  }
+
+  .main-navigation .menu li div {
+    background-color: red;
+    width:100%;
+    height:10px;
   }
   .prev-next-wrap {
     margin: 15px;

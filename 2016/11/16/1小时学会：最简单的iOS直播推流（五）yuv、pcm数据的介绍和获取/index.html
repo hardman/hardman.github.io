@@ -1,0 +1,368 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="hardman的blog">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="https://hardman.github.io">
+    <!--SEO-->
+
+<meta name="description" content="iOS，web，游戏技术探索"/>
+
+
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+
+<title>1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取 | hardman的blog</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="hardman的blog" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1274215625 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1274215625%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpeg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='hardman'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> iOS开发，对web和游戏开发也有些许兴趣~ </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://hardman.github.io">hardman的blog</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                                <div id="menu-line-0"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS/"><i class="fa "></i>iOS</a>
+                                <div id="menu-line-1"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/iOS推流/"><i class="fa "></i>iOS推流</a>
+                                <div id="menu-line-2"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/cocos/"><i class="fa "></i>cocos</a>
+                                <div id="menu-line-3"></div>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>归档</a>
+                                <div id="menu-line-4"></div>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取">
+            
+	            1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/iOS推流">
+            iOS推流
+        </a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/iOS" title='iOS'>
+                        iOS
+                    </a>
+                
+                    <a href="/tags/iOS推流" title='iOS推流'>
+                        iOS推流
+                    </a>
+                
+                    <a href="/tags/源码" title='源码'>
+                        源码
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2016/11/16</span>
+        </span>
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>最简单的iOS 推流代码，视频捕获，软编码(faac，x264)，硬编码（aac，h264），美颜，flv编码，rtmp协议，陆续更新代码解析，你想学的知识这里都有，愿意懂直播技术的同学快来看！！</p>
+</blockquote>
+<blockquote>
+<p>源代码：<a href="https://github.com/hardman/AWLive" target="_blank" rel="noopener">https://github.com/hardman/AWLive</a></p>
+</blockquote>
+<p>前面介绍了如何通过相机实时获取音视频数据。</p>
+<p>我们接下来就需要了解获取到的数据到底是什么样的。</p>
+<p><a href="http://blog.csdn.net/hard_man/article/details/53157423" target="_blank" rel="noopener">使用系统提供的接口获取到的音视频数据</a>都保存在CMSampleBufferRef中。</p>
+<p><a href="http://blog.csdn.net/hard_man/article/details/53180497" target="_blank" rel="noopener">使用GPUImamge获取</a>到的音频数据为CMSampleBufferRef，获取到的视频格式为BGRA格式的二进制数据。</p>
+<h2 id="CMSampleBufferRef介绍"><a href="#CMSampleBufferRef介绍" class="headerlink" title="CMSampleBufferRef介绍"></a>CMSampleBufferRef介绍</h2><p>这个结构在iOS中表示一帧音频/视频数据。</p>
+<p>它里面包含了这一帧数据的内容和格式。</p>
+<p>我们可以把它的内容取出来，提取出/转换成 我们想要的数据。</p>
+<p>代表视频的CMSampleBufferRef中保存的数据是yuv420格式的视频帧(因为我们在视频输出设置中将输出格式设为：kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange)。</p>
+<p>代表音频的CMSampleBufferRef中保存的数据是PCM格式的音频帧。</p>
+<h2 id="yuv是什么？NV12又是什么？"><a href="#yuv是什么？NV12又是什么？" class="headerlink" title="yuv是什么？NV12又是什么？"></a>yuv是什么？NV12又是什么？</h2><p>视频是由一帧一帧的数据连接而成，而一帧视频数据其实就是一张图片。</p>
+<p>yuv是一种图片储存格式，跟RGB格式类似。</p>
+<p>RGB格式的图片很好理解，计算机中的大多数图片，都是以RGB格式存储的。</p>
+<p>yuv中，y表示亮度，单独只有y数据就可以形成一张图片，只不过这张图片是灰色的。u和v表示色差(u和v也被称为：Cb－蓝色差，Cr－红色差)，</p>
+<p>为什么要yuv？</p>
+<p>有一定历史原因，最早的电视信号，为了兼容黑白电视，采用的就是yuv格式。</p>
+<p>一张yuv的图像，去掉uv，只保留y，这张图片就是黑白的。</p>
+<p>而且yuv可以通过抛弃色差来进行带宽优化。</p>
+<p>比如yuv420格式图像相比RGB来说，要节省一半的字节大小，抛弃相邻的色差对于人眼来说，差别不大。</p>
+<p>一张yuv格式的图像，占用字节数为 (width <em> height + (width </em> height) / 4 + (width <em> height) / 4) = (width </em> height) <em> 3 / 2<br>一张RGB格式的图像，占用字节数为（width </em> height） * 3</p>
+<p>在传输上，yuv格式的视频也更灵活(yuv3种数据可分别传输)。</p>
+<p>很多视频编码器最初是不支持rgb格式的。但是所有的视频编码器都支持yuv格式。</p>
+<p>综合来讲，我们选择使用yuv格式，所以我们编码之前，首先将视频数据转成yuv格式。</p>
+<p>我们这里使用的就是yuv420格式的视频。</p>
+<p>yuv420也包含不同的数据排列格式：I420，NV12，NV21.</p>
+<p>其格式分别如下，<br>I420格式：y,u,v 3个部分分别存储：Y0,Y1…Yn,U0,U1…Un/2,V0,V1…Vn/2<br>NV12格式：y和uv 2个部分分别存储：Y0,Y1…Yn,U0,V0,U1,V1…Un/2,Vn/2<br>NV21格式：同NV12，只是U和V的顺序相反。</p>
+<p>综合来说，除了存储顺序不同之外，上述格式对于显示来说没有任何区别。</p>
+<p>使用哪种视频的格式，取决于初始化相机时设置的视频输出格式。<br>设置为kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange时，表示输出的视频格式为NV12；<br>设置为kCVPixelFormatType_420YpCbCr8Planar时，表示使用I420。</p>
+<p>GPUImage设置相机输出数据时，使用的就是NV12.</p>
+<p>为了一致，我们这里也选择NV12格式输出视频。</p>
+<h2 id="PCM是什么？"><a href="#PCM是什么？" class="headerlink" title="PCM是什么？"></a>PCM是什么？</h2><p>脉冲编码调制，其实是将不规则的模拟信号转换成数字信号，这样就可以通过物理介质存储起来。</p>
+<p>而声音也是一种特定频率（20-20000HZ）的模拟信号，也可以通过这种技术转换成数字信号，从而保存下来。</p>
+<p>PCM格式，就是录制声音时，保存的最原始的声音数据格式。</p>
+<p>相信你应该听说过wav格式的音频，它其实就是给PCM数据流加上一段header数据，就成为了wav格式。</p>
+<p>而wav格式有时候之所以被称为无损格式，就是因为他保存的是原始pcm数据（也跟采样率和比特率有关）。</p>
+<p>像我们耳熟能详的那些音频格式，mp3，aac等等，都是有损压缩，为了节约占用空间，在很少损失音效的基础上，进行最大程度的压缩。</p>
+<p>所有的音频编码器，都支持pcm编码，而且录制的声音，默认也是PCM格式，所以我们下一步就是要获取录制的PCM数据。</p>
+<h2 id="从CMSampleBufferRef中提取yuv数据"><a href="#从CMSampleBufferRef中提取yuv数据" class="headerlink" title="从CMSampleBufferRef中提取yuv数据"></a>从CMSampleBufferRef中提取yuv数据</h2><p>在前面的文章(<a href="http://blog.csdn.net/hard_man/article/details/53157423" target="_blank" rel="noopener">使用系统接口捕获视频</a>)中，初始化输出设备时，我们将输出的数据设置为kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange。<br>因此在CMSampleBufferRef中保存的是yuv420(NV12)格式数据。<br>通过下面的方法将CMSampleBufferRef转为yuv420(NV12)。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">// AWVideoEncoder.m文件</span><br><span class="line">-(NSData *) convertVideoSmapleBufferToYuvData:(CMSampleBufferRef) videoSample&#123;</span><br><span class="line">    // 获取yuv数据</span><br><span class="line">    // 通过CMSampleBufferGetImageBuffer方法，获得CVImageBufferRef。</span><br><span class="line">    // 这里面就包含了yuv420(NV12)数据的指针</span><br><span class="line">    CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(videoSample);</span><br><span class="line">    </span><br><span class="line">    //表示开始操作数据</span><br><span class="line">    CVPixelBufferLockBaseAddress(pixelBuffer, 0);</span><br><span class="line">    </span><br><span class="line">    //图像宽度（像素）</span><br><span class="line">    size_t pixelWidth = CVPixelBufferGetWidth(pixelBuffer);</span><br><span class="line">    //图像高度（像素）</span><br><span class="line">    size_t pixelHeight = CVPixelBufferGetHeight(pixelBuffer);</span><br><span class="line">    //yuv中的y所占字节数</span><br><span class="line">    size_t y_size = pixelWidth * pixelHeight;</span><br><span class="line">    //yuv中的uv所占的字节数</span><br><span class="line">    size_t uv_size = y_size / 2;</span><br><span class="line">    </span><br><span class="line">    uint8_t *yuv_frame = aw_alloc(uv_size + y_size);</span><br><span class="line">    </span><br><span class="line">    //获取CVImageBufferRef中的y数据</span><br><span class="line">    uint8_t *y_frame = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0);</span><br><span class="line">    memcpy(yuv_frame, y_frame, y_size);</span><br><span class="line">    </span><br><span class="line">    //获取CMVImageBufferRef中的uv数据</span><br><span class="line">    uint8_t *uv_frame = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1);</span><br><span class="line">    memcpy(yuv_frame + y_size, uv_frame, uv_size);</span><br><span class="line">    </span><br><span class="line">    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);</span><br><span class="line">    </span><br><span class="line">    //返回数据</span><br><span class="line">    return [NSData dataWithBytesNoCopy:yuv_frame length:y_size + uv_size];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="将GPUImage获取到的BGRA格式的图片转成yuv-NV12-格式"><a href="#将GPUImage获取到的BGRA格式的图片转成yuv-NV12-格式" class="headerlink" title="将GPUImage获取到的BGRA格式的图片转成yuv(NV12)格式"></a>将GPUImage获取到的BGRA格式的图片转成yuv(NV12)格式</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">//AWGPUImageAVCapture.m文件</span><br><span class="line">-(void)newFrameReadyAtTime:(CMTime)frameTime atIndex:(NSInteger)textureIndex&#123;</span><br><span class="line">    [super newFrameReadyAtTime:frameTime atIndex:textureIndex];</span><br><span class="line">    if(!self.capture || !self.capture.isCapturing)&#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    //将bgra转为yuv</span><br><span class="line">    //图像宽度</span><br><span class="line">    int width = imageSize.width;</span><br><span class="line">    //图像高度</span><br><span class="line">    int height = imageSize.height;</span><br><span class="line">    //宽*高</span><br><span class="line">    int w_x_h = width * height;</span><br><span class="line">    //yuv数据长度 = (宽 * 高) * 3 / 2</span><br><span class="line">    int yuv_len = w_x_h * 3 / 2;</span><br><span class="line">    </span><br><span class="line">    //yuv数据</span><br><span class="line">    uint8_t *yuv_bytes = malloc(yuv_len);</span><br><span class="line">    </span><br><span class="line">    //ARGBToNV12这个函数是libyuv这个第三方库提供的一个将bgra图片转为yuv420格式的一个函数。</span><br><span class="line">    //libyuv是google提供的高性能的图片转码操作。支持大量关于图片的各种高效操作，是视频推流不可缺少的重要组件，你值得拥有。</span><br><span class="line">    [self lockFramebufferForReading];</span><br><span class="line">    ARGBToNV12(self.rawBytesForImage, width * 4, yuv_bytes, width, yuv_bytes + w_x_h, width, width, height);</span><br><span class="line">    [self unlockFramebufferAfterReading];</span><br><span class="line">    </span><br><span class="line">    NSData *yuvData = [NSData dataWithBytesNoCopy:yuv_bytes length:yuv_len];</span><br><span class="line">    </span><br><span class="line">    [self.capture sendVideoYuvData:yuvData];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="从CMSampleBufferRef中提取PCM数据"><a href="#从CMSampleBufferRef中提取PCM数据" class="headerlink" title="从CMSampleBufferRef中提取PCM数据"></a>从CMSampleBufferRef中提取PCM数据</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// AWAudioEncoder.m 文件</span><br><span class="line">-(NSData *) convertAudioSmapleBufferToPcmData:(CMSampleBufferRef) audioSample&#123;</span><br><span class="line">    //获取pcm数据大小</span><br><span class="line">    NSInteger audioDataSize = CMSampleBufferGetTotalSampleSize(audioSample);</span><br><span class="line">    </span><br><span class="line">    //分配空间</span><br><span class="line">    int8_t *audio_data = aw_alloc((int32_t)audioDataSize);</span><br><span class="line">    </span><br><span class="line">    //获取CMBlockBufferRef</span><br><span class="line">    //这个结构里面就保存了 PCM数据</span><br><span class="line">    CMBlockBufferRef dataBuffer = CMSampleBufferGetDataBuffer(audioSample);</span><br><span class="line">    //直接将数据copy至我们自己分配的内存中</span><br><span class="line">    CMBlockBufferCopyDataBytes(dataBuffer, 0, audioDataSize, audio_data);</span><br><span class="line">    </span><br><span class="line">    //返回数据</span><br><span class="line">    return [NSData dataWithBytesNoCopy:audio_data length:audioDataSize];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此我们已经将捕获的视频数据转为了yuv420格式，将音频数据转为了pcm格式。</p>
+<p>接下来就可以对这些数据进行各种编码了。编码完成后，就可以将数据发送给服务器了。</p>
+<h2 id="文章列表"><a href="#文章列表" class="headerlink" title="文章列表"></a>文章列表</h2><ol>
+<li><a href="/2016/11/07/1小时学会：最简单的iOS直播推流（一）介绍/">1小时学会：最简单的iOS直播推流（一）项目介绍</a></li>
+<li><a href="/2016/11/10/1小时学会：最简单的iOS直播推流（二）代码架构概述/">1小时学会：最简单的iOS直播推流（二）代码架构概述</a></li>
+<li><a href="/2016/11/14/1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频数据/">1小时学会：最简单的iOS直播推流（三）使用系统接口捕获音视频</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜/">1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜</a></li>
+<li><a href="/2016/11/16/1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取/">1小时学会：最简单的iOS直播推流（五）yuv、pcm数据的介绍和获取</a></li>
+<li><a href="/2016/11/24/1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍/">1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍</a></li>
+<li><a href="/2016/12/07/1小时学会：最简单的iOS直播推流（七）h264-aac-硬编码/">1小时学会：最简单的iOS直播推流（七）h264/aac 硬编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（八）h264-aac-软编码/">1小时学会：最简单的iOS直播推流（八）h264/aac 软编码</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（九）flv-编码与音视频时间戳同步/">1小时学会：最简单的iOS直播推流（九）flv 编码与音视频时间戳同步</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十）librtmp使用介绍/">1小时学会：最简单的iOS直播推流（十）librtmp使用介绍</a></li>
+<li><a href="/2017/11/23/1小时学会：最简单的iOS直播推流（十一）sps-amp-pps和AudioSpecificConfig介绍（完结）/">1小时学会：最简单的iOS直播推流（十一）sps&amp;pps和AudioSpecificConfig介绍（完结）</a></li>
+<li><a href="/2017/01/25/1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里/">1小时学会：最简单的iOS直播推流（番外）运行不起AWLive的demo的同学请看这里</a></li>
+</ol>
+
+    </div>
+
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">hardman</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2016/11/24/1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍/" class="pre-post btn btn-default" title='1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍 '>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（六）h264、aac、flv介绍 </span>
+        </a>
+    
+    
+        <a href="/2016/11/16/1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜/" class="next-post btn btn-default" title='1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">1小时学会：最简单的iOS直播推流（四）如何使用GPUImage，如何美颜</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+    
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'kL6uvsjGUgAWOmaJfW8iYNYz-gzGzoHsz',
+            appKey: 'X0NBsfhG3fTX42b6xpCLsvsP',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: false,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: 'zh-CN'.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#CMSampleBufferRef介绍"><span class="toc-text">CMSampleBufferRef介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yuv是什么？NV12又是什么？"><span class="toc-text">yuv是什么？NV12又是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PCM是什么？"><span class="toc-text">PCM是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#从CMSampleBufferRef中提取yuv数据"><span class="toc-text">从CMSampleBufferRef中提取yuv数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#将GPUImage获取到的BGRA格式的图片转成yuv-NV12-格式"><span class="toc-text">将GPUImage获取到的BGRA格式的图片转成yuv(NV12)格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#从CMSampleBufferRef中提取PCM数据"><span class="toc-text">从CMSampleBufferRef中提取PCM数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文章列表"><span class="toc-text">文章列表</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"> 
+                <span>Copyright &copy; 2018
+                </span> | 
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> | 
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+
+</body>
+</html>

@@ -13,6 +13,48 @@ window.onload = function() {
         $toc = document.getElementById("article-toc"),
         timer = null;
 
+    //nav下划线
+
+    var navArr = ["", "iOS/", "推流/", "cocos/", "archives/"];
+
+    var menuNavIdx = -1;
+
+    for(var i = 0; i < navArr.length; i++) {
+        var name = navArr[i];
+        if(i == 0 && location.pathname == "/") {
+            setMenuNavIdx(i);
+            break;
+        }else if(location.href.indexOf(encodeURI(name)) > 0){
+            setMenuNavIdx(i);
+            break;
+        }
+    }
+
+    var $menuNav = document.getElementsByClassName("menu-line");
+    var navCount = $menuNav.length;
+    
+    function setMenuNavBtmLine(idx, show){
+        console.log(" --- set idx " + idx + ", show " + show);
+        var $line = document.getElementById("menu-line-" + idx);
+        if(!$line){
+            return;
+        }
+        if(show) {
+            $line.setAttribute("class", "menu-line")
+        }else{
+            $line.setAttribute("class", "")   
+        }
+    }
+
+    function setMenuNavIdx(idx) {
+        if(idx == menuNavIdx){
+            return;
+        }
+        setMenuNavBtmLine(menuNavIdx, false);
+        menuNavIdx = idx;
+        setMenuNavBtmLine(menuNavIdx, true);
+    }
+
     //设备判断
     var isPC = true;
     (function(designPercent) {
